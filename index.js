@@ -8,7 +8,7 @@
  *
  *
  *
- *
+ * TODO add storage interface, by default with simple cookies
  * TODO make sure that only one combo at a time is bound
  * TODO make sure that there may not be more than one action defined and throw error otherwise
  * TODO class and package structure
@@ -46,7 +46,9 @@ export function Hotkeys(action, combo, handler, extra = null, options) {
         category: "",
         target: window.document,
         selector: null,
-        description: "-/-"
+        description: "-/-",
+        stopPropagation:true,
+        preventDefault:true
     }
 
 
@@ -62,14 +64,28 @@ export function Hotkeys(action, combo, handler, extra = null, options) {
 
     var t = hasSecondHandler ? 'up/down' : 'keypress'
 
-    _keys[combo + '-' + t] = {action, combo, handler, extra: t};
+    _keys[combo + '-' + t] = {action, combo, handler, extra: t,defaults:combo};
 
 
     function applyHandlers(target) {
+
+        function handlerWrapper(e){
+
+            if (options.stopPropagation)
+                e.stopPropagation()
+
+            if (options.preventDefault)
+                e.preventDefault()
+
+
+            return handler.apply(this,arguments)
+        }
+
+
         if (!hasSecondHandler) {
-            Mousetrap(target).bind(combo, handler);
+            Mousetrap(target).bind(combo, handlerWrapper);
         } else {
-            Mousetrap(target).bind(combo, handler, 'keydown');
+            Mousetrap(target).bind(combo, handlerWrapper, 'keydown');
             Mousetrap(target).bind(combo, extra, 'keyup');
         }
     }
