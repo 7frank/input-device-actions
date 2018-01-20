@@ -1,6 +1,6 @@
 {
   "name": "@nk/keyboard-interactions",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "a wrapper for mousetrap with additional actions  to be able to change hotkeys for actions via dialog",
   "author": "Frank Reimann (https://github.com/frank1147)",
   "main": "index.js",
