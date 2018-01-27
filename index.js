@@ -12,6 +12,8 @@
  * TODO make sure that only one combo at a time is bound
  * TODO make sure that there may not be more than one action defined and throw error otherwise
  * TODO class and package structure
+ *
+ *
  */
 
 import {onElementChange} from "./listeners"
@@ -21,10 +23,12 @@ import Mousetrap from 'mousetrap';
 import $ from 'jquery';
 
 var _keys = {};
+var _already_set_combos = {}
+var _events = $({})
 
 /**
  *
- * @param action -  TODO action shoud contain the category string
+ * @param action -  TODO action should contain the category string
  * @param {(string|array)}combo - one or many combos eg. ctrl+s TODO touch gestures would be nice for customisation
  * @param handler - based on extra param is handler for keypress or keydown event
  * @param extra - if extra is a function, it will be interpreted as keyup event  and the handler will be keydown event else handler is keypress
@@ -43,52 +47,60 @@ export function Hotkeys(action, combo, handler, extra = null, options) {
 
 
     var defaults = {
-        category: "",
+        category: "default",
         target: window.document,
         selector: null,
         description: "-/-",
-        stopPropagation:true,
-        preventDefault:true
+        stopPropagation: true,
+        preventDefault: true,
+        error: false
     }
-
 
     options = extend(defaults, options)
 
+    options.action = action
+    options.combo = combo
+    options.defaults = combo
 
-    var hasSecondHandler = typeof extra == "function";
 
-    if (_keys[combo]) {
-        console.error("key '" + combo + "' already set");
+    options.handler = handler
+    options.extra = extra
+
+
+    //creating an instance to track unbinds and stuff @see https://github.com/ccampbell/mousetrap/issues/256
+    var instance=new Mousetrap(options.target)
+    options.el=instance
+
+
+    var t = hasSecondHandler(options) ? 'up/down' : 'keypress'
+
+
+    if (_keys[action]) {
+        console.warn("action '" + action + "' already set");
         return;
     }
 
-    var t = hasSecondHandler ? 'up/down' : 'keypress'
 
-    _keys[combo + '-' + t] = {action, combo, handler, extra: t,defaults:combo};
+    _keys[action] = options
+
+
 
 
     function applyHandlers(target) {
 
-        function handlerWrapper(e){
-
-            if (options.stopPropagation)
-                e.stopPropagation()
-
-            if (options.preventDefault)
-                e.preventDefault()
+        bind(options,target)
 
 
-            return handler.apply(this,arguments)
-        }
-
-
-        if (!hasSecondHandler) {
-            Mousetrap(target).bind(combo, handlerWrapper);
-        } else {
-            Mousetrap(target).bind(combo, handlerWrapper, 'keydown');
-            Mousetrap(target).bind(combo, extra, 'keyup');
-        }
     }
+
+//have a list of combos and their previously set actions
+    if (_already_set_combos[combo + '-' + t]) {
+
+        _keys[action].error = "already set by '" + _already_set_combos[combo + '-' + t] + "'"
+
+        return
+    }
+    _already_set_combos[combo + '-' + t] = action
 
 
     applyHandlers(options.target)
@@ -103,7 +115,101 @@ export function Hotkeys(action, combo, handler, extra = null, options) {
 
         })
 
+    _events.trigger("change", [])
 
+
+}
+
+
+Hotkeys.onChange = function (handler) {
+    _events.on("change", handler)
+
+
+}
+
+/**
+ *
+ *
+ * @param opt
+ * @param target - FIXME this value changes for "live" bound objects .. this interferes with unbinding as it is of now, which bunbinds the options.target only
+ */
+function bind(opt,target) {
+
+    function handlerWrapper(e) {
+
+        if (opt.stopPropagation)
+            e.stopPropagation()
+
+        if (opt.preventDefault)
+            e.preventDefault()
+
+
+        return opt.handler.apply(this, arguments)
+    }
+
+    function handlerWrapper2(e) {
+
+        if (opt.stopPropagation)
+            e.stopPropagation()
+
+        if (opt.preventDefault)
+            e.preventDefault()
+
+
+        return opt.extra.apply(this, arguments)
+    }
+
+//creating an instance to track unbinds and stuff @see https://github.com/ccampbell/mousetrap/issues/256
+    var instance=opt.el
+
+
+//NOTE: make sure that the ctrl sequence is lowercase, otherwise mousetrap will ignore it completely
+    if (!hasSecondHandler(opt)) {
+        instance.bind(opt.combo.toLowerCase(), handlerWrapper);
+    } else {
+        instance.bind(opt.combo.toLowerCase(), handlerWrapper, 'keydown');
+        instance.bind(opt.combo.toLowerCase(), handlerWrapper2, 'keyup');
+    }
+
+}
+
+export function isBound(combo) {
+    return _already_set_combos[combo] != null
+}
+
+export function isBoundTo(combo) {
+    return _already_set_combos[combo]
+}
+
+export function rebind(action, newCombo) {
+    _already_set_combos[newCombo] = action
+    var opt = _keys[action]
+
+
+    var instance=opt.el
+
+    if (!hasSecondHandler(opt)) {
+        instance.unbind(opt.combo);
+    } else {
+        instance.unbind(opt.combo, 'keydown');
+        instance.unbind(opt.combo, 'keyup');
+    }
+
+    opt.combo = newCombo
+
+
+    console.log("action to rebind",action)
+setTimeout(function(){
+
+    bind(opt)
+},500)
+
+
+
+}
+
+function hasSecondHandler(o) {
+    return typeof o.extra == "function"
 }
 
 
@@ -142,7 +248,7 @@ export function showHotkeyList() {
     $.each(_keys, function (k, v) {
         var row = $('<div>').append(v.action, "'", v.combo, "'");
 
-        if (v.extra == 'keypress') {
+        if (typeof v.extra == 'function') {
             row.append('  (release to undo)');
         }
 
