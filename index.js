@@ -12,7 +12,7 @@
  * TODO make sure that only one combo at a time is bound
  * TODO make sure that there may not be more than one action defined and throw error otherwise
  * TODO class and package structure
- *
+ * FIXME handle umlaute and other international equivalent characters via e.key
  *
  */
 
@@ -20,6 +20,10 @@ import {onElementChange} from "./listeners"
 import {assignIn as extend} from 'lodash';
 
 import Mousetrap from 'mousetrap';
+import * as keypress from 'keypress.js/keypress-2.1.4.min';
+
+
+
 import $ from 'jquery';
 
 var _keys = {};
@@ -71,10 +75,10 @@ export function Hotkeys(action, combo, handler, extra = null, options) {
 
     if (!options.title) options.title = options.action
 
+    //init the wrapper
+   // options.el =getMousetrapInstance(options)
 
-    //creating an instance to track unbinds and stuff @see https://github.com/ccampbell/mousetrap/issues/256
-    var instance = new Mousetrap(options.target);
-    options.el = instance;
+    options.el =getKJSInstance(options)
 
 
     var t = hasSecondHandler(options) ? 'up/down' : 'keypress';
@@ -220,18 +224,119 @@ function bindSingleCombo(opt, comboParam, target) {
     }
 
 //creating an instance to track unbinds and stuff @see https://github.com/ccampbell/mousetrap/issues/256
-    var instance = opt.el;
+    var instance =  opt.el;
 
 
 //NOTE: make sure that the ctrl sequence is lowercase, otherwise mousetrap will ignore it completely
-    if (!hasSecondHandler(opt)) {
-        instance.bind(comboParam.combo.toLowerCase(), handlerWrapper);
-    } else {
-        instance.bind(comboParam.combo.toLowerCase(), handlerWrapper, 'keydown');
-        instance.bind(comboParam.combo.toLowerCase(), handlerWrapper2, 'keyup');
-    }
+   instance.bind(comboParam.combo.toLowerCase(), handlerWrapper)
+
+
 
 }
+
+/**
+ * A simple wrapper for different keyboard libs. In this case Mousetrap.js
+ *
+ * @param options
+ * @returns {{bind: (function())}}
+ */
+function getMousetrapInstance(options)
+{
+
+    //creating an instance to track unbinds and stuff @see https://github.com/ccampbell/mousetrap/issues/256
+    var instance = new Mousetrap(options.target);
+
+
+
+    return {
+        bind(comboParam,handlerWrapper){
+            if (!hasSecondHandler(options)) {
+                instance.bind(comboParam, handlerWrapper);
+            } else {
+                instance.bind(comboParam, handlerWrapper, 'keydown');
+                instance.bind(comboParam, options.extra, 'keyup');
+            }
+
+        }, unbind(prevCombo){
+
+            if (!hasSecondHandler(options)) {
+                instance.unbind(prevCombo);
+            } else {
+                instance.unbind(prevCombo, 'keydown');
+                instance.unbind(prevCombo, 'keyup');
+            }
+        }}
+
+
+}
+
+
+/**
+ * Another wrapper like {@see getMousetrapInstance}
+ *
+ * @param options
+ * @returns {{bind: (function())}}
+ */
+function getKJSInstance(options)
+{
+
+    //creating an instance to track unbinds and stuff @see https://github.com/ccampbell/mousetrap/issues/256
+
+    var instance =new keypress.Listener(options.target);
+
+
+
+    return {
+        bind(comboParam,handlerWrapper){
+
+
+            //place default "+" operator
+            comboParam= _.replace(comboParam,new RegExp("\\+","g")," ")
+            console.log(comboParam)
+
+
+         //   if (!hasSecondHandler(options)) {
+          //      instance.simple_combo(comboParam, handlerWrapper);
+
+
+           // } else {
+               // instance.bind(comboParam, handlerWrapper, 'keydown');
+               // instance.bind(comboParam, handlerWrapper2, 'keyup');
+
+                instance.register_combo({
+                    "keys"              : comboParam,
+                    "on_keydown"        : handlerWrapper,
+                    "on_keyup"          : options.extra,
+                    //"on_release"        : null,
+                   // "this"              : undefined,
+                    "prevent_default"   : options.preventDefault,
+                   /* "prevent_repeat"    : false,
+                    "is_unordered"      : false,
+                    "is_counting"       : false,
+                    "is_exclusive"      : false,
+                    "is_solitary"       : false,
+                    "is_sequence"       : false*/
+                });
+
+
+         //   }
+
+        }, unbind(prevCombo){
+
+            //place default "+" operator
+            prevCombo= _.replace(prevCombo,new RegExp("\\+","g")," ")
+
+          //  if (!hasSecondHandler(options)) {
+                instance.unregister_combo(prevCombo)
+          /*  } else {
+                instance.unbind(prevCombo, 'keydown');
+                instance.unbind(prevCombo, 'keyup');
+            }*/
+        }}
+
+
+}
+
 
 export function isBound(combo) {
     return _already_set_combos[combo] != null
@@ -260,12 +365,7 @@ function unbind(opt,prevCombo) {
 
     var instance = opt.el;
 
-    if (!hasSecondHandler(opt)) {
-        instance.unbind(prevCombo.combo.toLowerCase());
-    } else {
-        instance.unbind(prevCombo.combo.toLowerCase(), 'keydown');
-        instance.unbind(prevCombo.combo.toLowerCase(), 'keyup');
-    }
+     instance.unbind(prevCombo.combo.toLowerCase())
 
 }
 
