@@ -249,19 +249,22 @@ function getActionByName(action) {
 
 
 /**
+ * Note: mousetrap needs its sequences to be lower case otherwise it will fail silently
  *
  * @param opt - the config object
  * @param prevCombo - a single entry for a single combo of a config object
  */
 function unbind(opt,prevCombo) {
 
+    console.log("unbinding",opt,prevCombo)
+
     var instance = opt.el;
 
     if (!hasSecondHandler(opt)) {
-        instance.unbind(prevCombo.combo);
+        instance.unbind(prevCombo.combo.toLowerCase());
     } else {
-        instance.unbind(prevCombo.combo, 'keydown');
-        instance.unbind(prevCombo.combo, 'keyup');
+        instance.unbind(prevCombo.combo.toLowerCase(), 'keydown');
+        instance.unbind(prevCombo.combo.toLowerCase(), 'keyup');
     }
 
 }
@@ -318,7 +321,6 @@ export function rebind(action, entryID, newCombo) {
 
 /**
  *
- * FIXME unbinding does not work all the time
  *
  * @param {string} action - the action which shall  be reset
  * @param {(string)} [comboID] - If no specific id is given all combos are reset to default.
