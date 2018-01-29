@@ -23,8 +23,8 @@ import Mousetrap from 'mousetrap';
 import $ from 'jquery';
 
 var _keys = {};
-var _already_set_combos = {}
-var _events = $({})
+var _already_set_combos = {};
+var _events = $({});
 
 /**
  *
@@ -37,6 +37,7 @@ var _events = $({})
  * @param {(HTMLElement|undefined)} options.target -  the element to bind the action to
  * @param {string} options.selector -   selector-string for binding existing or later added elements
  * @param {string} options.description -  some text with additional information about the binding
+ * @param {string} options.title -  a brief title fr the action (can be used for internationalisation). If left blank, the 'action' attribute will be used in place
  * @constructor
  *
  */
@@ -53,26 +54,30 @@ export function Hotkeys(action, combo, handler, extra = null, options) {
         description: "-/-",
         stopPropagation: true,
         preventDefault: true,
-        error: false
-    }
+        error: false,
+        title: null
+    };
 
-    options = extend(defaults, options)
+    options = extend(defaults, options);
 
-    options.action = action
-    options.combo = combo
-    options.defaults = combo
+    options.action = action;
+    options.combo = convertComboParams(combo);
+    options.defaults =  _.values(extend({},  options.combo));
 
 
-    options.handler = handler
-    options.extra = extra
+    options.handler = handler;
+    options.extra = extra;
+
+
+    if (!options.title) options.title = options.action
 
 
     //creating an instance to track unbinds and stuff @see https://github.com/ccampbell/mousetrap/issues/256
-    var instance=new Mousetrap(options.target)
-    options.el=instance
+    var instance = new Mousetrap(options.target);
+    options.el = instance;
 
 
-    var t = hasSecondHandler(options) ? 'up/down' : 'keypress'
+    var t = hasSecondHandler(options) ? 'up/down' : 'keypress';
 
 
     if (_keys[action]) {
@@ -81,14 +86,13 @@ export function Hotkeys(action, combo, handler, extra = null, options) {
     }
 
 
-    _keys[action] = options
-
-
+    _keys[action] = options;
 
 
     function applyHandlers(target) {
 
-        bind(options,target)
+        bindAllCombos(options, options.combo, target)
+        // bindSingleCombo(options,options.combo,target)
 
 
     }
@@ -96,24 +100,24 @@ export function Hotkeys(action, combo, handler, extra = null, options) {
 //have a list of combos and their previously set actions
     if (_already_set_combos[combo + '-' + t]) {
 
-        _keys[action].error = "already set by '" + _already_set_combos[combo + '-' + t] + "'"
+        _keys[action].error = "already set by '" + _already_set_combos[combo + '-' + t] + "'";
 
         return
     }
-    _already_set_combos[combo + '-' + t] = action
+    _already_set_combos[combo + '-' + t] = action;
 
 
-    applyHandlers(options.target)
+    applyHandlers(options.target);
 
 
     if (options.selector != null)
         onElementChange(options.target, options.selector, function onTargetChanged(arr) {
 
-            console.log("hotkeys target ...", arguments)
+            console.log("hotkeys target ...", arguments);
 
             applyHandlers(arr[0].added[0])
 
-        })
+        });
 
     _events.trigger("change", [])
 
@@ -125,23 +129,79 @@ Hotkeys.onChange = function (handler) {
     _events.on("change", handler)
 
 
+};
+
+/**
+ * converts the combo parameter into an array of valid combo parameters
+ */
+
+function convertComboParams(comboParams) {
+
+    function def() {
+
+
+        var defaults = {
+            type: "keyboard",
+            combo: null
+        };
+        return defaults
+    }
+
+    function strToObj(comboParam) {
+        return extend(def(), {combo: comboParam});
+
+    }
+
+    if (typeof comboParams === "string")
+        comboParams = [strToObj(comboParams)]
+
+
+    comboParams = _.map(comboParams, (comboParam) => {
+        if (typeof comboParam === "string")
+            return strToObj(comboParam)
+        else
+            return extend(def(), comboParam);
+    })
+
+    return comboParams
 }
+
+/**
+ * one to bind 'em all
+ *
+ *
+ * @param {object[]} comboParams - an array of combo param objects
+ */
+function bindAllCombos(options, comboParams, target) {
+    _.each(comboParams, function (comboParam, k) {
+
+        bindSingleCombo(options, comboParam, target)
+
+    })
+}
+
 
 /**
  *
  *
  * @param opt
- * @param target - FIXME this value changes for "live" bound objects .. this interferes with unbinding as it is of now, which bunbinds the options.target only
+ * @param target - FIXME this value changes for "live" bound objects .. this interferes with unbinding as it is of now, which unbinds the options.target only
  */
-function bind(opt,target) {
+function bindSingleCombo(opt, comboParam, target) {
+
+    if (comboParam.combo == null) {
+
+        console.warn("action " + opt.action + " invalid combo:", comboParam)
+        return
+    }
 
     function handlerWrapper(e) {
 
         if (opt.stopPropagation)
-            e.stopPropagation()
+            e.stopPropagation();
 
         if (opt.preventDefault)
-            e.preventDefault()
+            e.preventDefault();
 
 
         return opt.handler.apply(this, arguments)
@@ -150,25 +210,25 @@ function bind(opt,target) {
     function handlerWrapper2(e) {
 
         if (opt.stopPropagation)
-            e.stopPropagation()
+            e.stopPropagation();
 
         if (opt.preventDefault)
-            e.preventDefault()
+            e.preventDefault();
 
 
         return opt.extra.apply(this, arguments)
     }
 
 //creating an instance to track unbinds and stuff @see https://github.com/ccampbell/mousetrap/issues/256
-    var instance=opt.el
+    var instance = opt.el;
 
 
 //NOTE: make sure that the ctrl sequence is lowercase, otherwise mousetrap will ignore it completely
     if (!hasSecondHandler(opt)) {
-        instance.bind(opt.combo.toLowerCase(), handlerWrapper);
+        instance.bind(comboParam.combo.toLowerCase(), handlerWrapper);
     } else {
-        instance.bind(opt.combo.toLowerCase(), handlerWrapper, 'keydown');
-        instance.bind(opt.combo.toLowerCase(), handlerWrapper2, 'keyup');
+        instance.bind(comboParam.combo.toLowerCase(), handlerWrapper, 'keydown');
+        instance.bind(comboParam.combo.toLowerCase(), handlerWrapper2, 'keyup');
     }
 
 }
@@ -181,33 +241,164 @@ export function isBoundTo(combo) {
     return _already_set_combos[combo]
 }
 
-export function rebind(action, newCombo) {
-    _already_set_combos[newCombo] = action
-    var opt = _keys[action]
+
+function getActionByName(action) {
+    return _keys[action]
+
+}
 
 
-    var instance=opt.el
+/**
+ *
+ * @param opt - the config object
+ * @param prevCombo - a single entry for a single combo of a config object
+ */
+function unbind(opt,prevCombo) {
+
+    var instance = opt.el;
 
     if (!hasSecondHandler(opt)) {
-        instance.unbind(opt.combo);
+        instance.unbind(prevCombo.combo);
     } else {
-        instance.unbind(opt.combo, 'keydown');
-        instance.unbind(opt.combo, 'keyup');
+        instance.unbind(prevCombo.combo, 'keydown');
+        instance.unbind(prevCombo.combo, 'keyup');
     }
 
-    opt.combo = newCombo
+}
 
 
-    console.log("action to rebind",action)
-setTimeout(function(){
 
-    bind(opt)
-},500)
+/**
+ * TODO rebind should only work if an action was previously bound
+ * TODO newCombo should be the object containing type and actual combo
+ * @param action
+ * @param {number} entryID - the id of the entry within the array
+ * @param newCombo
+ */
+export function rebind(action, entryID, newCombo) {
 
+
+    if (typeof action != "string") console.error("must be a valid action")
+    if (typeof entryID != "number") console.error("must be a number")
+    if (typeof newCombo == "undefined") console.error("there must be a new combo specified to override old one")
+
+    _already_set_combos[newCombo] = action;
+    var opt = getActionByName(action);
+
+
+    var instance = opt.el;
+
+
+    var prevCombo = opt.combo[entryID]
+
+    if (typeof prevCombo != "object") console.error("no combo found for params", action, entryID)
+
+/*
+    if (!hasSecondHandler(opt)) {
+        instance.unbind(prevCombo.combo);
+    } else {
+        instance.unbind(prevCombo.combo, 'keydown');
+        instance.unbind(prevCombo.combo, 'keyup');
+    }
+*/
+    unbind(opt,prevCombo)
+
+
+    //opt.combo = newCombo;
+    opt.combo[entryID] = convertComboParams(newCombo)[0]
+
+    console.log("action to rebind", action, opt.combo[entryID]);
+    //TODO check if timeoout still necessary
+    setTimeout(function () {
+        bindSingleCombo(opt, opt.combo[entryID])
+    }, 500)
 
 
 }
 
+/**
+ *
+ * FIXME unbinding does not work all the time
+ *
+ * @param {string} action - the action which shall  be reset
+ * @param {(string)} [comboID] - If no specific id is given all combos are reset to default.
+ */
+export function resetActionCombosToDefault(action, comboID) {
+
+
+    var options = getActionByName(action)
+
+    var reset = (val, key) => {
+
+
+
+
+        if (options.defaults[key])
+        {
+            rebind(action, key, options.defaults[key].combo);
+            options.combo[key]=cloneObject(options.defaults[key])
+
+        }
+        else {
+
+            unbind(options, options.combo[key])
+            delete options.combo[key]
+
+        }
+
+    }
+
+
+    if (comboID != null)
+        reset(options.combo, comboID)
+    else
+        _.each(options.combo, reset)
+
+    //remove null values
+    options.combo= _.compact(options.combo);
+
+
+    _events.trigger("change", [])
+
+
+}
+
+/**
+ * creates a placeholder element which has an error state by default
+ * @param action
+ */
+
+export function addComboForAction(action)
+{
+    var options = getActionByName(action)
+
+
+    var param=convertComboParams("")[0]
+
+    param.error="create a valid combo"
+
+    options.combo.push(param)
+    // options.defaults.push(cloneObject(param))
+
+
+    _events.trigger("change", [])
+
+    return param
+
+}
+
+function cloneObject(options)
+{
+
+    return extend({},options)
+
+}
+
+/**
+ *
+ * @param o - the option object that may have a second handler defined
+ * @returns {boolean}
+ */
 function hasSecondHandler(o) {
     return typeof o.extra == "function"
 }
@@ -218,42 +409,23 @@ export function getRegistered() {
 
 }
 
-export function showHotkeyList() {
-    var style = `
 
-    display:none;
-    position:absolute;
-    left:20%;
-    top:20%;
-    bottom:20%;
-    right:20%;
-    background-color: rgba(255,255,255,0.3);
-    overflow: auto;
-    padding: 2em;
-    pointer-events:none;
- 
-  
-  `;
+/**
+ *
+ * TODO only have a console log here
+ * */
+export function logHotkeyList() {
 
-    var dlg = $('body').children('.hotkeys-dialog');
 
-    if (dlg.length == 0) {
-        dlg = $('<div>').addClass('hotkeys-dialog').attr('style', style).appendTo('body');
-    }
-
-    dlg.html('');
-
-    dlg.append('<div>------------Hotkeys & Actions defined--------------</div><hr>');
+    console.log('');
+    console.log('------------Hotkeys & Actions defined--------------');
 
     $.each(_keys, function (k, v) {
-        var row = $('<div>').append(v.action, "'", v.combo, "'");
 
-        if (typeof v.extra == 'function') {
-            row.append('  (release to undo)');
-        }
+        console.log(v.action, v.combo, v)
 
-        dlg.append(row);
     });
 
-    dlg.toggle();
+    console.log('------------Hotkeys & Actions end--------------');
+    console.log('');
 }
