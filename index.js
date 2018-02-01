@@ -1,8 +1,5 @@
-//import "./interactions"
-
-
 /**
- * Conatins some wrappers to customise hotkeys for keyboard input.
+ * Contains some wrappers to customise hotkeys for keyboard input.
  * By default hotkeys for lets say an action "save" are bound like "ctrl+s".
  * This plugin allows for the user to later remap the key combo used to trigger the "save" action via dialog.
  *
@@ -15,6 +12,8 @@
  * FIXME handle umlaute and other international equivalent characters via e.key
  *
  */
+
+//import "./interactions"
 
 import {onElementChange} from "./listeners"
 import {assignIn as extend} from 'lodash';
@@ -33,7 +32,7 @@ var _events = $({});
 /**
  *
  * @param action -  TODO action should contain the category string
- * @param {(string|array)}combo - one or many combos eg. ctrl+s TODO touch gestures would be nice for customisation
+ * @param {(string|array[string]|array[object])}combo - one or many combos eg. ctrl+s TODO touch gestures would be nice for customisation
  * @param handler - based on extra param is handler for keypress or keydown event
  * @param extra - if extra is a function, it will be interpreted as keyup event  and the handler will be keydown event else handler is keypress
  * @param options - contains additional options, might be passed in place of param 'extra' if no keyup handler is needed
@@ -55,7 +54,7 @@ export function Hotkeys(action, combo, handler, extra = null, options) {
         category: "default",
         target: window.document,
         selector: null,
-        description: "-/-",
+        description: "",
         stopPropagation: true,
         preventDefault: true,
         error: false,
@@ -292,7 +291,7 @@ function getKJSInstance(options)
 
             //place default "+" operator
             comboParam= _.replace(comboParam,new RegExp("\\+","g")," ")
-            console.log(comboParam)
+
 
 
          //   if (!hasSecondHandler(options)) {
@@ -361,7 +360,7 @@ function getActionByName(action) {
  */
 function unbind(opt,prevCombo) {
 
-    console.log("unbinding",opt,prevCombo)
+
 
     var instance = opt.el;
 
