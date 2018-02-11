@@ -237,8 +237,9 @@ function bindSingleCombo(opt, comboParam, target) {
  * A simple wrapper for different keyboard libs. In this case Mousetrap.js
  *
  * @param options
- * @returns {{bind: (function())}}
+ * @returns {{bind: (function(*=, *=)), unbind: (function(*=)), pause: pause, unpause: unpause}}
  */
+
 function getMousetrapInstance(options)
 {
 
@@ -264,6 +265,15 @@ function getMousetrapInstance(options)
                 instance.unbind(prevCombo, 'keydown');
                 instance.unbind(prevCombo, 'keyup');
             }
+        },pause:function(){
+
+            instance.pause()
+
+        },
+        unpause:function(){
+
+            instance.unpause()
+
         }}
 
 
@@ -331,6 +341,15 @@ function getKJSInstance(options)
                 instance.unbind(prevCombo, 'keydown');
                 instance.unbind(prevCombo, 'keyup');
             }*/
+        },pause:function(){
+
+            instance.stop_listening()
+
+        },
+        unpause:function(){
+
+            instance.listen()
+
         }}
 
 
@@ -530,3 +549,5 @@ export function logHotkeyList() {
     console.log('------------Hotkeys & Actions end--------------');
     console.log('');
 }
+
+
