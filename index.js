@@ -75,9 +75,12 @@ export function Hotkeys(action, combo, handler, extra = null, options) {
     if (!options.title) options.title = options.action
 
     //init the wrapper
-   // options.el =getMousetrapInstance(options)
+    options.el =getMousetrapInstance(options)
 
-    options.el =getKJSInstance(options)
+
+    //NOTE: keyboard.js does have problems with special characters like öä# on non english keyboards
+    //therefore we will rely on mousetrap once again and not support arbitrary combo features k.js does have to offer
+    //options.el =getKJSInstance(options)
 
 
     var t = hasSecondHandler(options) ? 'up/down' : 'keypress';
