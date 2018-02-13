@@ -8,8 +8,17 @@
  * TODO add storage interface, by default with simple cookies
  * TODO make sure that only one combo at a time is bound
  * TODO make sure that there may not be more than one action defined and throw error otherwise
- * TODO class and package structure
- * FIXME handle umlaute and other international equivalent characters via e.key
+ * TODO improve class and package structure
+ *
+ * NOTE: mousetrap does handle umlaute and other international equivalent characters that are set via  KeydownEvent.key in state-of-the-art browsers
+ *      This is something the other HI and keypress.js don't to my knowledge.
+ *
+ * TODO support keypress.js js combos via keyboard-alt?
+ *      TODO integrate HI insteadhttps://github.com/liftoff/HumanInput instead
+ * TODO support mouse clicks and meta keys
+ * TODO trigger the action on the bound element so that others may listen to them
+ * like for strafe-left rotate-left within a a-frame control
+ *
  *
  */
 
@@ -18,12 +27,15 @@
 import {onElementChange} from "./listeners"
 import {assignIn as extend} from 'lodash';
 
-import Mousetrap from 'mousetrap';
-import * as keypress from 'keypress.js/keypress-2.1.4.min';
 
 
 
 import $ from 'jquery';
+import {getMousetrapInstance} from "./src/mousetrap-wrapper";
+import {getKJSInstance} from "./src/keypress-js-wrapper";
+import {hasSecondHandler} from "./src/utils";
+import {getHumanInputInstance} from "./src/human-input-wrapper";
+
 
 var _keys = {};
 var _already_set_combos = {};
@@ -75,7 +87,10 @@ export function Hotkeys(action, combo, handler, extra = null, options) {
     if (!options.title) options.title = options.action
 
     //init the wrapper
-    options.el =getMousetrapInstance(options)
+    //options.el =getMousetrapInstance(options)
+
+
+    options.el =getHumanInputInstance(options)
 
 
     //NOTE: keyboard.js does have problems with special characters like öä# on non english keyboards
@@ -236,127 +251,6 @@ function bindSingleCombo(opt, comboParam, target) {
 
 }
 
-/**
- * A simple wrapper for different keyboard libs. In this case Mousetrap.js
- *
- * @param options
- * @returns {{bind: (function(*=, *=)), unbind: (function(*=)), pause: pause, unpause: unpause}}
- */
-
-function getMousetrapInstance(options)
-{
-
-    //creating an instance to track unbinds and stuff @see https://github.com/ccampbell/mousetrap/issues/256
-    var instance = new Mousetrap(options.target);
-
-
-
-    return {
-        bind(comboParam,handlerWrapper){
-            if (!hasSecondHandler(options)) {
-                instance.bind(comboParam, handlerWrapper);
-            } else {
-                instance.bind(comboParam, handlerWrapper, 'keydown');
-                instance.bind(comboParam, options.extra, 'keyup');
-            }
-
-        }, unbind(prevCombo){
-
-            if (!hasSecondHandler(options)) {
-                instance.unbind(prevCombo);
-            } else {
-                instance.unbind(prevCombo, 'keydown');
-                instance.unbind(prevCombo, 'keyup');
-            }
-        },pause:function(){
-
-            instance.pause()
-
-        },
-        unpause:function(){
-
-            instance.unpause()
-
-        }}
-
-
-}
-
-
-/**
- * Another wrapper like {@see getMousetrapInstance}
- *
- * @param options
- * @returns {{bind: (function())}}
- */
-function getKJSInstance(options)
-{
-
-    //creating an instance to track unbinds and stuff @see https://github.com/ccampbell/mousetrap/issues/256
-
-    var instance =new keypress.Listener(options.target);
-
-
-
-    return {
-        bind(comboParam,handlerWrapper){
-
-
-            //place default "+" operator
-            comboParam= _.replace(comboParam,new RegExp("\\+","g")," ")
-
-
-
-         //   if (!hasSecondHandler(options)) {
-          //      instance.simple_combo(comboParam, handlerWrapper);
-
-
-           // } else {
-               // instance.bind(comboParam, handlerWrapper, 'keydown');
-               // instance.bind(comboParam, handlerWrapper2, 'keyup');
-
-                instance.register_combo({
-                    "keys"              : comboParam,
-                    "on_keydown"        : handlerWrapper,
-                    "on_keyup"          : options.extra,
-                    //"on_release"        : null,
-                   // "this"              : undefined,
-                    "prevent_default"   : options.preventDefault,
-                   /* "prevent_repeat"    : false,
-                    "is_unordered"      : false,
-                    "is_counting"       : false,
-                    "is_exclusive"      : false,
-                    "is_solitary"       : false,
-                    "is_sequence"       : false*/
-                });
-
-
-         //   }
-
-        }, unbind(prevCombo){
-
-            //place default "+" operator
-            prevCombo= _.replace(prevCombo,new RegExp("\\+","g")," ")
-
-          //  if (!hasSecondHandler(options)) {
-                instance.unregister_combo(prevCombo)
-          /*  } else {
-                instance.unbind(prevCombo, 'keydown');
-                instance.unbind(prevCombo, 'keyup');
-            }*/
-        },pause:function(){
-
-            instance.stop_listening()
-
-        },
-        unpause:function(){
-
-            instance.listen()
-
-        }}
-
-
-}
 
 
 export function isBound(combo) {
@@ -367,7 +261,7 @@ export function isBoundTo(combo) {
     return _already_set_combos[combo]
 }
 
-
+export
 function getActionByName(action) {
     return _keys[action]
 
@@ -517,14 +411,7 @@ function cloneObject(options)
 
 }
 
-/**
- *
- * @param o - the option object that may have a second handler defined
- * @returns {boolean}
- */
-function hasSecondHandler(o) {
-    return typeof o.extra == "function"
-}
+
 
 
 export function getRegistered() {

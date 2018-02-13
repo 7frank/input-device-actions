@@ -14,6 +14,7 @@
   ],
   "license": "MIT",
   "dependencies": {
+    "humaninput": "^1.1.15",
     "jquery": "^3.2.1",
     "keypress.js": "^2.1.4",
     "lodash": "^4.17.4",
