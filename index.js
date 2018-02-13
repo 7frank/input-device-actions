@@ -25,9 +25,7 @@
 //import "./interactions"
 
 import {onElementChange} from "./listeners"
-import {assignIn as extend} from 'lodash';
-
-
+import {assignIn as extend, forEach} from 'lodash';
 
 
 import $ from 'jquery';
@@ -77,7 +75,7 @@ export function Hotkeys(action, combo, handler, extra = null, options) {
 
     options.action = action;
     options.combo = convertComboParams(combo);
-    options.defaults =  _.values(extend({},  options.combo));
+    options.defaults = _.values(extend({}, options.combo));
 
 
     options.handler = handler;
@@ -90,7 +88,7 @@ export function Hotkeys(action, combo, handler, extra = null, options) {
     //options.el =getMousetrapInstance(options)
 
 
-    options.el =getHumanInputInstance(options)
+    options.el = getHumanInputInstance(options)
 
 
     //NOTE: keyboard.js does have problems with special characters like öä# on non english keyboards
@@ -216,6 +214,25 @@ function bindSingleCombo(opt, comboParam, target) {
         return
     }
 
+
+    function trigger(e) {
+        //convert all relevant elements into one array
+        var el = opt.target
+        if (opt.selector)
+            el = el.querySelectorAll(opt.selector)
+        else el = [el]
+
+        forEach(el, function (val) {
+
+            var event = new CustomEvent(opt.action, { target: val });
+            console.log("dispatchEvent",event)
+            val.dispatchEvent(event)
+
+        })
+    }
+
+
+    //handle stuff
     function handlerWrapper(e) {
 
         if (opt.stopPropagation)
@@ -224,10 +241,13 @@ function bindSingleCombo(opt, comboParam, target) {
         if (opt.preventDefault)
             e.preventDefault();
 
+        var res=opt.handler.apply(this, arguments)
+        trigger(e);
 
-        return opt.handler.apply(this, arguments)
+        return res
     }
 
+    //TODO the second handler  is currently not used in here
     function handlerWrapper2(e) {
 
         if (opt.stopPropagation)
@@ -236,21 +256,22 @@ function bindSingleCombo(opt, comboParam, target) {
         if (opt.preventDefault)
             e.preventDefault();
 
+        var res=opt.extra.apply(this, arguments)
+        trigger(e);
 
-        return opt.extra.apply(this, arguments)
+        return res
+
     }
 
 //creating an instance to track unbinds and stuff @see https://github.com/ccampbell/mousetrap/issues/256
-    var instance =  opt.el;
+    var instance = opt.el;
 
 
 //NOTE: make sure that the ctrl sequence is lowercase, otherwise mousetrap will ignore it completely
-   instance.bind(comboParam.combo.toLowerCase(), handlerWrapper)
-
+    instance.bind(comboParam.combo.toLowerCase(), handlerWrapper)
 
 
 }
-
 
 
 export function isBound(combo) {
@@ -261,8 +282,7 @@ export function isBoundTo(combo) {
     return _already_set_combos[combo]
 }
 
-export
-function getActionByName(action) {
+export function getActionByName(action) {
     return _keys[action]
 
 }
@@ -274,16 +294,14 @@ function getActionByName(action) {
  * @param opt - the config object
  * @param prevCombo - a single entry for a single combo of a config object
  */
-function unbind(opt,prevCombo) {
-
+function unbind(opt, prevCombo) {
 
 
     var instance = opt.el;
 
-     instance.unbind(prevCombo.combo.toLowerCase())
+    instance.unbind(prevCombo.combo.toLowerCase())
 
 }
-
 
 
 /**
@@ -311,15 +329,15 @@ export function rebind(action, entryID, newCombo) {
 
     if (typeof prevCombo != "object") console.error("no combo found for params", action, entryID)
 
-/*
-    if (!hasSecondHandler(opt)) {
-        instance.unbind(prevCombo.combo);
-    } else {
-        instance.unbind(prevCombo.combo, 'keydown');
-        instance.unbind(prevCombo.combo, 'keyup');
-    }
-*/
-    unbind(opt,prevCombo)
+    /*
+        if (!hasSecondHandler(opt)) {
+            instance.unbind(prevCombo.combo);
+        } else {
+            instance.unbind(prevCombo.combo, 'keydown');
+            instance.unbind(prevCombo.combo, 'keyup');
+        }
+    */
+    unbind(opt, prevCombo)
 
 
     //opt.combo = newCombo;
@@ -348,12 +366,9 @@ export function resetActionCombosToDefault(action, comboID) {
     var reset = (val, key) => {
 
 
-
-
-        if (options.defaults[key])
-        {
+        if (options.defaults[key]) {
             rebind(action, key, options.defaults[key].combo);
-            options.combo[key]=cloneObject(options.defaults[key])
+            options.combo[key] = cloneObject(options.defaults[key])
 
         }
         else {
@@ -372,7 +387,7 @@ export function resetActionCombosToDefault(action, comboID) {
         _.each(options.combo, reset)
 
     //remove null values
-    options.combo= _.compact(options.combo);
+    options.combo = _.compact(options.combo);
 
 
     _events.trigger("change", [])
@@ -385,14 +400,13 @@ export function resetActionCombosToDefault(action, comboID) {
  * @param action
  */
 
-export function addComboForAction(action)
-{
+export function addComboForAction(action) {
     var options = getActionByName(action)
 
 
-    var param=convertComboParams("")[0]
+    var param = convertComboParams("")[0]
 
-    param.error="create a valid combo"
+    param.error = "create a valid combo"
 
     options.combo.push(param)
     // options.defaults.push(cloneObject(param))
@@ -404,14 +418,11 @@ export function addComboForAction(action)
 
 }
 
-function cloneObject(options)
-{
+function cloneObject(options) {
 
-    return extend({},options)
+    return extend({}, options)
 
 }
-
-
 
 
 export function getRegistered() {
