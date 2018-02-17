@@ -13,7 +13,21 @@
 
 # Project Overview
 
-This library contains a simple wrapper for *different* input methods. By introducing an 'action' to bind multiple input combos plus their handlers with it a better customisation by the user may be achieved. 
+This library contains a simple wrapper for *different* input methods. By introducing an 'action' to bind multiple input combos plus their handlers with it a better customisation by the user may be achieved.
+
+For example:
+```javascript
+function hello()
+{    console.log("hello world") }
+
+//bind the action to ctrl+space as default trigger
+Hotkeys("hello-action", "ctrl+space", hello)
+``` 
+
+For the time being this is not meant to be a stand alone library
+But rather as a backend for a compatible GUI.
+For the reference implementation dowload npm "@nk/core-components" and check out the "nk-hotkey-dialog" example
+
 
 ## Features
 * Better Usability by customizing Keyboard Inputs

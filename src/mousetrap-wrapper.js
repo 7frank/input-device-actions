@@ -20,12 +20,12 @@ function getMousetrapInstance(options)
 
     return {
         _instance:instance,//we'll expose the instance for customization
-        bind(comboParam,handlerWrapper){
+        bind(comboParam,handlerWrapper,handlerWrapper2){
             if (!hasSecondHandler(options)) {
                 instance.bind(comboParam, handlerWrapper);
             } else {
                 instance.bind(comboParam, handlerWrapper, 'keydown');
-                instance.bind(comboParam, options.extra, 'keyup');
+                instance.bind(comboParam, handlerWrapper2, 'keyup');
             }
 
         }, unbind(prevCombo){

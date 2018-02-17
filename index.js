@@ -62,7 +62,7 @@ export function Hotkeys(action, combo, handler, extra = null, options) {
 
     var defaults = {
         category: "default",
-        target: window.document,
+        target: window,
         selector: null,
         description: "",
         stopPropagation: true,
@@ -84,11 +84,15 @@ export function Hotkeys(action, combo, handler, extra = null, options) {
 
     if (!options.title) options.title = options.action
 
+
+    //TODO to be able to use multiple keyboard and input librraries we need to put the options.el into the options.combo[n].el namespace
+    //or we'll need one map that contains once instance (options.els[n]) per library
+    // used
     //init the wrapper
-    //options.el =getMousetrapInstance(options)
+    options.el = getMousetrapInstance(options)
 
 
-    options.el = getHumanInputInstance(options)
+    // options.el = getHumanInputInstance(options)
 
 
     //NOTE: keyboard.js does have problems with special characters like öä# on non english keyboards
@@ -142,6 +146,18 @@ export function Hotkeys(action, combo, handler, extra = null, options) {
 
 
 }
+
+/**
+ * TODO implementation, check doc for how to add static description
+ * @param {string} type - the name o f the type you want it to be associated with. the default already registered one would be keyboard-
+ * @param {fonction} factory - the factory that generated the type handling object. {@see getMousetrapInstance}
+ *
+ */
+Hotkeys.registerInputType = function (type,factory) {
+
+    throw new Error("not yet supported in this version")
+
+};
 
 
 Hotkeys.onChange = function (handler) {
@@ -205,7 +221,7 @@ function bindAllCombos(options, comboParams, target) {
  *
  * @param opt
  * @param target - FIXME this value changes for "live" bound objects .. this interferes with unbinding as it is of now, which unbinds the options.target only
- */
+  */
 function bindSingleCombo(opt, comboParam, target) {
 
     if (comboParam.combo == null) {
@@ -214,8 +230,11 @@ function bindSingleCombo(opt, comboParam, target) {
         return
     }
 
-
-    function trigger(e) {
+    /**
+     * @param e
+     * @param isFirstHandler - wheather it is the trigger for the first or second handler in case the option contains the extra attribute which is said handler
+     */
+    function trigger(e,isFirstHandler) {
         //convert all relevant elements into one array
         var el = opt.target
         if (opt.selector)
@@ -224,15 +243,25 @@ function bindSingleCombo(opt, comboParam, target) {
 
         forEach(el, function (val) {
 
-            var event = new CustomEvent(opt.action, { target: val });
-            console.log("dispatchEvent",event)
+            var event = new CustomEvent(opt.action, {
+                target: val,
+                detail: {
+                    isActionEvent: true,
+                    first: isFirstHandler,
+                    second: !isFirstHandler
+                }
+            });
+
             val.dispatchEvent(event)
 
         })
     }
 
 
-    //handle stuff
+    //handler 1 and 2 are distinguished by being opposites of the same combo
+    //say keydown and up again
+    //or mousedown and up
+    //or any event which can have an opposite
     function handlerWrapper(e) {
 
         if (opt.stopPropagation)
@@ -241,13 +270,12 @@ function bindSingleCombo(opt, comboParam, target) {
         if (opt.preventDefault)
             e.preventDefault();
 
-        var res=opt.handler.apply(this, arguments)
-        trigger(e);
+        var res = opt.handler.apply(this, arguments)
+        trigger(e,true);
 
         return res
     }
 
-    //TODO the second handler  is currently not used in here
     function handlerWrapper2(e) {
 
         if (opt.stopPropagation)
@@ -256,8 +284,8 @@ function bindSingleCombo(opt, comboParam, target) {
         if (opt.preventDefault)
             e.preventDefault();
 
-        var res=opt.extra.apply(this, arguments)
-        trigger(e);
+        var res = opt.extra.apply(this, arguments)
+        trigger(e,false);
 
         return res
 
@@ -268,7 +296,7 @@ function bindSingleCombo(opt, comboParam, target) {
 
 
 //NOTE: make sure that the ctrl sequence is lowercase, otherwise mousetrap will ignore it completely
-    instance.bind(comboParam.combo.toLowerCase(), handlerWrapper)
+    instance.bind(comboParam.combo.toLowerCase(), handlerWrapper,handlerWrapper2)
 
 
 }
@@ -343,7 +371,9 @@ export function rebind(action, entryID, newCombo) {
     //opt.combo = newCombo;
     opt.combo[entryID] = convertComboParams(newCombo)[0]
 
-    console.log("action to rebind", action, opt.combo[entryID]);
+    //console.log("action to rebind", action, opt.combo[entryID]);
+
+
     //TODO check if timeoout still necessary
     setTimeout(function () {
         bindSingleCombo(opt, opt.combo[entryID])

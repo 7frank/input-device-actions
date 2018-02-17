@@ -24,7 +24,7 @@ export function getHumanInputInstance(options) {
 
 //#hi_feedback
     var instance ;
-    if (options.target==window.document)
+    if (options.target==window)
     {
 
         var settings = {
