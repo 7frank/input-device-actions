@@ -150,12 +150,28 @@ export function Hotkeys(action, combo, handler, extra = null, options) {
 /**
  * TODO implementation, check doc for how to add static description
  * @param {string} type - the name o f the type you want it to be associated with. the default already registered one would be keyboard-
- * @param {fonction} factory - the factory that generated the type handling object. {@see getMousetrapInstance}
- *
+ * @param {function} factory - the factory that generated the type handling object. {@see getMousetrapInstance}
+ * @static
+ * @function
+
+ * @memberOf Hotkeys
  */
 Hotkeys.registerInputType = function (type,factory) {
 
     throw new Error("not yet supported in this version")
+
+    //would be something like
+    // if (!_types[type]
+    // _types[type]=factory
+
+    /*
+    //check interface for correctness
+    var test=factory()
+    var hasAllKeys = "bind,unbind,pause,unpause".split(",").every(function(item){
+        return test.hasOwnProperty(item);
+    });
+*/
+    // example: Hotkeys.registerInputType("keyboard",getMousetrapInstance)
 
 };
 
