@@ -1,7 +1,7 @@
 {
-  "name": "@nk/keyboard-interactions",
+  "name": "@nk11/keyboard-interactions",
   "version": "0.2.0",
-  "description": "a wrapper for mousetrap with additional actions  to be able to change hotkeys for actions via dialog",
+  "description": "a wrapper for mousetrap with additional actions to be able to change hotkeys for actions via dialog",
   "author": "Frank Reimann (https://github.com/frank1147)",
   "main": "index.js",
   "scripts": {
@@ -15,10 +15,14 @@
   "license": "MIT",
   "dependencies": {
     "humaninput": "^1.1.15",
-    "jquery": "^3.2.1",
-    "keypress.js": "^2.1.4",
-    "lodash": "^4.17.4",
+    "jquery": "^3.3.1",
+    "keypress.js": "^2.1.5",
+    "lodash": "^4.17.10",
     "mousetrap": "^1.6.1",
     "mutation-summary": "^0.1.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/frank1147/input-device-actions.git"
   }
 }

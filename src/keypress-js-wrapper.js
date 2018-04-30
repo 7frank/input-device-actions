@@ -1,5 +1,5 @@
 
-import * as keypress from 'keypress.js/keypress-2.1.4.min';
+import * as keypress from 'keypress.js';
 
 /**
  * Another wrapper like {@see getMousetrapInstance}
