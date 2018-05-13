@@ -24,15 +24,41 @@
 
 //import "./interactions"
 
-import {onElementChange} from "./listeners"
+import {onElementChange} from "../listeners"
 import {assignIn as extend, forEach} from 'lodash';
 
 
 import $ from 'jquery';
-import {getMousetrapInstance} from "./src/mousetrap-wrapper";
-import {getKJSInstance} from "./src/keypress-js-wrapper";
-import {hasSecondHandler} from "./src/utils";
-import {getHumanInputInstance} from "./src/human-input-wrapper";
+import {getMousetrapInstance} from "./mousetrap-wrapper";
+import {getKJSInstance} from "./keypress-js-wrapper";
+import {hasSecondHandler} from "./utils";
+import {getHumanInputInstance} from "./human-input-wrapper";
+import * as _ from "lodash";
+
+/**
+ * will add additional handlers to be able to send keyboard events to target
+ * @param target
+ */
+function fixFocusAndOtherThingsForNow(target)
+{
+    if (target.__hasFocusFixed) return
+
+    if (target.hasAttribute && !target.hasAttribute("tabIndex"))
+    target.setAttribute("tabIndex","-1")
+
+//TODO handle cases where this is not wanted
+    if (target.style)
+        target.style.outline="none";
+//TODO handle cases where this is not wanted
+    target.addEventListener("mouseenter",()=> target.focus())
+    target.addEventListener("mouseleave",()=> target.blur())
+
+    target.__hasFocusFixed=true
+  //  if (target.setAttribute)
+  // target.setAttribute("contenteditable","true")
+
+}
+
 
 
 var _keys = {};
@@ -41,10 +67,95 @@ var _events = $({});
 
 /**
  *
- * @param action -  TODO action should contain the category string
- * @param {(string|array[string]|array[object])}combo - one or many combos eg. ctrl+s TODO touch gestures would be nice for customisation
  * @param handler - based on extra param is handler for keypress or keydown event
  * @param extra - if extra is a function, it will be interpreted as keyup event  and the handler will be keydown event else handler is keypress
+ */
+
+
+export function Hotkeys(target = window) {
+
+    var that = this;
+
+    fixFocusAndOtherThingsForNow(target)
+
+
+    return {
+        on: function (action, handler, extra = null) {
+
+
+            //global options
+            let defaults = _keys[action];
+
+            //FIXME wait for Hotkeys.register if no defaults exist
+
+            var options = extend({}, defaults);
+            options.handler = handler;
+            options.extra = extra;
+            options.target = target
+
+
+            //---------------------------------
+
+            //TODO to be able to use multiple keyboard and input libraries we need to put the options.el into the options.combo[n].el namespace
+            //or we'll need one map that contains once instance (options.els[n]) per library
+            // used
+            //init the wrapper
+
+            //FIXME have one options object or input device instance per target
+            options.el = getMousetrapInstance(options)
+
+
+            // options.el = getHumanInputInstance(options)
+
+
+            //NOTE: keyboard.js does have problems with special characters like öä# on non english keyboards
+            //therefore we will rely on mousetrap once again and not support arbitrary combo features which keyboard.js would offer
+            //options.el =getKJSInstance(options)
+
+
+            //---------------------------------
+
+
+
+            function applyHandlers(target) {
+
+                console.log(options, options.combo, target)
+                bindAllCombos(options, options.combo, target)
+                // bindSingleCombo(options,options.combo,target)
+
+            }
+
+
+            applyHandlers(options.target);
+
+
+            if (options.selector != null)
+                onElementChange(options.target, options.selector, function onTargetChanged(arr) {
+
+                    console.log("hotkeys target ...", arguments);
+
+                    applyHandlers(arr[0].added[0])
+
+                });
+            return that;
+        },
+        off: function (action, handler, extra = null) {
+
+        throw new Error("implementation")
+           // unbind(opt, prevCombo)
+
+
+            return that;
+        }
+
+
+    }
+
+}
+
+/**
+ * @param action -  TODO action should contain the category string default.sample-action
+ * @param {(string|array[string]|array[object])}combo - one or many combos eg. ctrl+s TODO touch gestures would be nice for customisation
  * @param options - contains additional options, might be passed in place of param 'extra' if no keyup handler is needed
  * @param {(string|array[string])} options.category -  example: "Default.save File" or array of string ["Default","File safe"]
  * @param {(HTMLElement|undefined)} options.target -  the element to bind the action to
@@ -54,15 +165,12 @@ var _events = $({});
  * @constructor
  *
  */
-export function Hotkeys(action, combo, handler, extra = null, options) {
 
-    if (typeof extra == "object")
-        options = extra;
-
+Hotkeys.register = function (action, combo, options) {
 
     var defaults = {
         category: "default",
-        target: window,
+       // target: window,
         selector: null,
         description: "",
         stopPropagation: true,
@@ -78,29 +186,13 @@ export function Hotkeys(action, combo, handler, extra = null, options) {
     options.defaults = _.values(extend({}, options.combo));
 
 
-    options.handler = handler;
-    options.extra = extra;
+    // options.handler = handler;
+    // options.extra = extra;
 
 
     if (!options.title) options.title = options.action
 
 
-    //TODO to be able to use multiple keyboard and input librraries we need to put the options.el into the options.combo[n].el namespace
-    //or we'll need one map that contains once instance (options.els[n]) per library
-    // used
-    //init the wrapper
-    options.el = getMousetrapInstance(options)
-
-
-    // options.el = getHumanInputInstance(options)
-
-
-    //NOTE: keyboard.js does have problems with special characters like öä# on non english keyboards
-    //therefore we will rely on mousetrap once again and not support arbitrary combo features k.js does have to offer
-    //options.el =getKJSInstance(options)
-
-
-    var t = hasSecondHandler(options) ? 'up/down' : 'keypress';
 
 
     if (_keys[action]) {
@@ -111,16 +203,14 @@ export function Hotkeys(action, combo, handler, extra = null, options) {
 
     _keys[action] = options;
 
+    //--------------------------------
 
-    function applyHandlers(target) {
+    //have a list of combos and their previously set actions
+    //FIXME foreach combo
 
-        bindAllCombos(options, options.combo, target)
-        // bindSingleCombo(options,options.combo,target)
+    var t = hasSecondHandler(options) ? 'up/down' : 'keypress';
 
 
-    }
-
-//have a list of combos and their previously set actions
     if (_already_set_combos[combo + '-' + t]) {
 
         _keys[action].error = "already set by '" + _already_set_combos[combo + '-' + t] + "'";
@@ -129,34 +219,26 @@ export function Hotkeys(action, combo, handler, extra = null, options) {
     }
     _already_set_combos[combo + '-' + t] = action;
 
+    //--------------------------------
 
-    applyHandlers(options.target);
 
-
-    if (options.selector != null)
-        onElementChange(options.target, options.selector, function onTargetChanged(arr) {
-
-            console.log("hotkeys target ...", arguments);
-
-            applyHandlers(arr[0].added[0])
-
-        });
 
     _events.trigger("change", [])
 
 
 }
 
+
 /**
  * TODO implementation, check doc for how to add static description
- * @param {string} type - the name o f the type you want it to be associated with. the default already registered one would be keyboard-
+ * @param {string} type - the name of the type you want it to be associated with. the default already registered one would be keyboard-
  * @param {function} factory - the factory that generated the type handling object. {@see getMousetrapInstance}
  * @static
  * @function
 
  * @memberOf Hotkeys
  */
-Hotkeys.registerInputType = function (type,factory) {
+Hotkeys.registerInputType = function (type, factory) {
 
     throw new Error("not yet supported in this version")
 
@@ -237,7 +319,7 @@ function bindAllCombos(options, comboParams, target) {
  *
  * @param opt
  * @param target - FIXME this value changes for "live" bound objects .. this interferes with unbinding as it is of now, which unbinds the options.target only
-  */
+ */
 function bindSingleCombo(opt, comboParam, target) {
 
     if (comboParam.combo == null) {
@@ -250,7 +332,7 @@ function bindSingleCombo(opt, comboParam, target) {
      * @param e
      * @param isFirstHandler - wheather it is the trigger for the first or second handler in case the option contains the extra attribute which is said handler
      */
-    function trigger(e,isFirstHandler) {
+    function trigger(e, isFirstHandler) {
         //convert all relevant elements into one array
         var el = opt.target
         if (opt.selector)
@@ -287,7 +369,7 @@ function bindSingleCombo(opt, comboParam, target) {
             e.preventDefault();
 
         var res = opt.handler.apply(this, arguments)
-        trigger(e,true);
+        trigger(e, true);
 
         return res
     }
@@ -301,7 +383,7 @@ function bindSingleCombo(opt, comboParam, target) {
             e.preventDefault();
 
         var res = opt.extra.apply(this, arguments)
-        trigger(e,false);
+        trigger(e, false);
 
         return res
 
@@ -310,9 +392,9 @@ function bindSingleCombo(opt, comboParam, target) {
 //creating an instance to track unbinds and stuff @see https://github.com/ccampbell/mousetrap/issues/256
     var instance = opt.el;
 
-
+console.log(comboParam.combo.toLowerCase(),opt.handler)
 //NOTE: make sure that the ctrl sequence is lowercase, otherwise mousetrap will ignore it completely
-    instance.bind(comboParam.combo.toLowerCase(), handlerWrapper,handlerWrapper2)
+    instance.bind(comboParam.combo.toLowerCase(), handlerWrapper, handlerWrapper2)
 
 
 }
@@ -475,26 +557,4 @@ export function getRegistered() {
     return _keys
 
 }
-
-
-/**
- *
- * TODO only have a console log here
- * */
-export function logHotkeyList() {
-
-
-    console.log('');
-    console.log('------------Hotkeys & Actions defined--------------');
-
-    $.each(_keys, function (k, v) {
-
-        console.log(v.action, v.combo, v)
-
-    });
-
-    console.log('------------Hotkeys & Actions end--------------');
-    console.log('');
-}
-
 
