@@ -76,11 +76,14 @@ export function Hotkeys(target = window) {
 
     var that = this;
 
+    //FIXME put this somewhere else as an option or something
     fixFocusAndOtherThingsForNow(target)
-
 
     return {
         on: function (action, handler, extra = null) {
+
+            if (typeof handler!="function") throw new Error("param 2 must be an instance of a function")
+            if (extra!=undefined && typeof extra!="function") throw new Error("keyup handler, param 3 must be an instance of a function")
 
 
             //global options
@@ -342,6 +345,7 @@ function bindSingleCombo(opt, comboParam, target) {
         forEach(el, function (val) {
 
             var event = new CustomEvent(opt.action, {
+                bubbles: true,
                 target: val,
                 detail: {
                     isActionEvent: true,
@@ -433,6 +437,9 @@ function unbind(opt, prevCombo) {
 /**
  * TODO rebind should only work if an action was previously bound
  * TODO newCombo should be the object containing type and actual combo
+ *
+ *
+ *
  * @param action
  * @param {number} entryID - the id of the entry within the array
  * @param newCombo
@@ -446,6 +453,9 @@ export function rebind(action, entryID, newCombo) {
 
     _already_set_combos[newCombo] = action;
     var opt = getActionByName(action);
+
+    //FIXME since 1.0.0 el is not set and will fail
+    //it is probably best to either keep a list of bound elements within the global options or have it stored somewhere similar
 
 
     var instance = opt.el;
