@@ -20,25 +20,49 @@ document.addEventListener("DOMContentLoaded", function(event) {
     Hotkeys.register("hello-action", "ctrl+space")
 
 
-    Hotkeys(window).on("hello-action",   function() {
+    Hotkeys(window).on("hello-action",   function(e) {
+        e.stopPropagation()
+
+        console.log(">>>",arguments)
         log("hello window")
     })
 
-    var target1= createRect("target1",200,500)
+    var target1= createRect("target1",100,300)
     document.body.appendChild(target1)
 
 
-    var targetWithinTarget= createRect("targetWithinTarget",100,100)
-    target1.appendChild(targetWithinTarget)
 
-
-    Hotkeys(target1).on("hello-action", function() {
+    Hotkeys(target1).on("hello-action", function(e) {
+        e.stopPropagation()
+        console.log(">>>",arguments)
         log("hello target1")
     })
 
 
-    Hotkeys(targetWithinTarget).on("hello-action", function() {
+    var targetWithinTarget= createRect("targetWithinTarget",50,50)
+    target1.appendChild(targetWithinTarget)
+
+
+    Hotkeys(targetWithinTarget).on("hello-action", function(e) {
+        e.stopPropagation()
+        console.log(">>>",arguments)
         log("hello targetWithinTarget")
+    })
+
+
+
+    var targetWithinTargetT= createRect("targetWithinTargetT",50,50)
+    targetWithinTarget.appendChild(targetWithinTargetT)
+
+
+    Hotkeys(targetWithinTargetT).on("hello-action", function(e) {
+        e.stopPropagation()
+        console.log(">>>down",arguments)
+        log("hello targetWithinTargetT")
+    },function(e) {
+        e.stopPropagation()
+        console.log(">>>up",arguments)
+        log("hello targetWithinTargetT")
     })
 
 

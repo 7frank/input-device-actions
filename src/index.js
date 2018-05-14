@@ -39,26 +39,22 @@ import * as _ from "lodash";
  * will add additional handlers to be able to send keyboard events to target
  * @param target
  */
-function fixFocusAndOtherThingsForNow(target)
-{
+function fixFocusAndOtherThingsForNow(target) {
     if (target.__hasFocusFixed) return
 
     if (target.hasAttribute && !target.hasAttribute("tabIndex"))
-    target.setAttribute("tabIndex","-1")
+        target.setAttribute("tabIndex", "-1")
 
 //TODO handle cases where this is not wanted
     if (target.style)
-        target.style.outline="none";
+        target.style.outline = "none";
 //TODO handle cases where this is not wanted
-    target.addEventListener("mouseenter",()=> target.focus())
-    target.addEventListener("mouseleave",()=> target.blur())
+    target.addEventListener("mouseenter", () => target.focus())
+    target.addEventListener("mouseleave", () => target.blur())
 
-    target.__hasFocusFixed=true
-  //  if (target.setAttribute)
-  // target.setAttribute("contenteditable","true")
+    target.__hasFocusFixed = true
 
 }
-
 
 
 var _keys = {};
@@ -79,11 +75,12 @@ export function Hotkeys(target = window) {
     //FIXME put this somewhere else as an option or something
     fixFocusAndOtherThingsForNow(target)
 
+
     return {
         on: function (action, handler, extra = null) {
 
-            if (typeof handler!="function") throw new Error("param 2 must be an instance of a function")
-            if (extra!=undefined && typeof extra!="function") throw new Error("keyup handler, param 3 must be an instance of a function")
+            if (typeof handler != "function") throw new Error("param 2 must be an instance of a function")
+            if (extra != undefined && typeof extra != "function") throw new Error("keyup handler, param 3 must be an instance of a function")
 
 
             //global options
@@ -116,13 +113,16 @@ export function Hotkeys(target = window) {
             //options.el =getKJSInstance(options)
 
 
-            //---------------------------------
+            //TODO refactor
+            defaults.elements.push(options.el)
 
+
+            //---------------------------------
 
 
             function applyHandlers(target) {
 
-                console.log(options, options.combo, target)
+                console.log("applyHandlers", options, options.combo, target)
                 bindAllCombos(options, options.combo, target)
                 // bindSingleCombo(options,options.combo,target)
 
@@ -144,8 +144,8 @@ export function Hotkeys(target = window) {
         },
         off: function (action, handler, extra = null) {
 
-        throw new Error("implementation")
-           // unbind(opt, prevCombo)
+            throw new Error("implementation")
+            // unbind(opt, prevCombo)
 
 
             return that;
@@ -173,13 +173,14 @@ Hotkeys.register = function (action, combo, options) {
 
     var defaults = {
         category: "default",
-       // target: window,
+        // target: window,
         selector: null,
         description: "",
         stopPropagation: true,
         preventDefault: true,
         error: false,
-        title: null
+        title: null,
+        elements: []
     };
 
     options = extend(defaults, options);
@@ -194,8 +195,6 @@ Hotkeys.register = function (action, combo, options) {
 
 
     if (!options.title) options.title = options.action
-
-
 
 
     if (_keys[action]) {
@@ -223,7 +222,6 @@ Hotkeys.register = function (action, combo, options) {
     _already_set_combos[combo + '-' + t] = action;
 
     //--------------------------------
-
 
 
     _events.trigger("change", [])
@@ -332,11 +330,13 @@ function bindSingleCombo(opt, comboParam, target) {
     }
 
     /**
+     *
      * @param e
-     * @param isFirstHandler - wheather it is the trigger for the first or second handler in case the option contains the extra attribute which is said handler
+     * @param isFirstHandler - weather it is the trigger for the first or second handler in case the option contains the extra attribute which is said handler
      */
-    function trigger(e, isFirstHandler) {
+    function createCustomActionEvent(e, isFirstHandler) {
         //convert all relevant elements into one array
+
         var el = opt.target
         if (opt.selector)
             el = el.querySelectorAll(opt.selector)
@@ -347,14 +347,17 @@ function bindSingleCombo(opt, comboParam, target) {
             var event = new CustomEvent(opt.action, {
                 bubbles: true,
                 target: val,
+                path: e.path,
+                currentTarget: e.path[0],
                 detail: {
                     isActionEvent: true,
                     first: isFirstHandler,
                     second: !isFirstHandler
                 }
             });
-
-            val.dispatchEvent(event)
+            //console.log("createCustomActionEvent", e.target, event)
+            // val.dispatchEvent(event)
+            e.target.dispatchEvent(event);
 
         })
     }
@@ -372,10 +375,11 @@ function bindSingleCombo(opt, comboParam, target) {
         if (opt.preventDefault)
             e.preventDefault();
 
-        var res = opt.handler.apply(this, arguments)
-        trigger(e, true);
 
-        return res
+        var ee = createCustomActionEvent(e, true);
+
+        // var res = opt.handler.apply(this, [ee])
+        // return res
     }
 
     function handlerWrapper2(e) {
@@ -386,17 +390,43 @@ function bindSingleCombo(opt, comboParam, target) {
         if (opt.preventDefault)
             e.preventDefault();
 
-        var res = opt.extra.apply(this, arguments)
-        trigger(e, false);
 
-        return res
+        var ee = createCustomActionEvent(e, false);
+        //var res = opt.extra.apply(this, arguments)
+
+        // return res
 
     }
+    //------------------------------------------------------
+    /**
+     * Add action listener
+     * TODO work in progress only partially using target and ignoring selector
+     */
+    opt.target.addEventListener(opt.action, function (e) {
+
+
+
+        if (!hasSecondHandler(opt)) {
+
+           // if (e.detail.second)
+                opt.handler.apply(this, arguments)
+        }
+        else {
+
+            if (e.detail.first)
+                opt.handler.apply(this, arguments)
+            if (e.detail.second)
+                opt.extra.apply(this, arguments)
+        }
+
+    })
+    //------------------------------------------------------
+
 
 //creating an instance to track unbinds and stuff @see https://github.com/ccampbell/mousetrap/issues/256
     var instance = opt.el;
 
-console.log(comboParam.combo.toLowerCase(),opt.handler)
+//console.log(comboParam.combo.toLowerCase(),opt.handler)
 //NOTE: make sure that the ctrl sequence is lowercase, otherwise mousetrap will ignore it completely
     instance.bind(comboParam.combo.toLowerCase(), handlerWrapper, handlerWrapper2)
 
@@ -454,7 +484,7 @@ export function rebind(action, entryID, newCombo) {
     _already_set_combos[newCombo] = action;
     var opt = getActionByName(action);
 
-    //FIXME since 1.0.0 el is not set and will fail
+    //FIXME  !!! since 1.0.0 el is not set and will fail
     //it is probably best to either keep a list of bound elements within the global options or have it stored somewhere similar
 
 
