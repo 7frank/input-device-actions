@@ -1,25 +1,24 @@
 /**
- * Contains some wrappers to customise hotkeys for keyboard input.
+ * Wrappers to customise hotkeys for keyboard input / human input (HI).
  * By default hotkeys for lets say an action "save" are bound like "ctrl+s".
  * This plugin allows for the user to later remap the key combo used to trigger the "save" action via dialog.
  *
- *
+ * - 1.0.2 - Now triggers the action on the bound element so that listeners get notified.
  *
  * TODO add storage interface, by default with simple cookies
  * TODO make sure that only one combo at a time is bound
  * TODO make sure that there may not be more than one action defined and throw error otherwise
  * TODO improve class and package structure
  *
- * NOTE: mousetrap does handle umlaute and other international equivalent characters that are set via  KeydownEvent.key in state-of-the-art browsers
- *      This is something the other HI and keypress.js don't to my knowledge.
+ * NOTE: mousetrap does handle umlaut and other international equivalent characters that are set via  KeydownEvent.key in state-of-the-art browsers
+ *      This is something the other HI and keypress.js to the authors knowledge don't .
  *
  * TODO support keypress.js js combos via keyboard-alt?
- *      TODO integrate HI insteadhttps://github.com/liftoff/HumanInput instead
+ * TODO integrate HI instead "https://github.com/liftoff/HumanInput"
  * TODO support mouse clicks and meta keys
- * TODO trigger the action on the bound element so that others may listen to them
- * like for strafe-left rotate-left within a a-frame control
  *
- *
+ *  see {@link https://github.com/fernandojsg/aframe-input-mapping-component} for thoughts
+ *  TODO contact author on potential things to include
  */
 
 //import "./interactions"
@@ -176,7 +175,7 @@ Hotkeys.register = function (action, combo, options) {
         // target: window,
         selector: null,
         description: "",
-        stopPropagation: true,
+        stopPropagation: true, //by default the human input (HI) will be caught and be converted into a bubbling action event thus we don't need to propagate the HI-event
         preventDefault: true,
         error: false,
         title: null,
@@ -264,6 +263,10 @@ Hotkeys.onChange = function (handler) {
 
 
 };
+
+Hotkeys.getRegistered = getRegistered;
+
+
 
 /**
  * converts the combo parameter into an array of valid combo parameters
@@ -401,6 +404,7 @@ function bindSingleCombo(opt, comboParam, target) {
     /**
      * Add action listener
      * TODO work in progress only partially using target and ignoring selector
+     * FIXME listener is called once more every time it is triggered
      */
     opt.target.addEventListener(opt.action, function (e) {
 
