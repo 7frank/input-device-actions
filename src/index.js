@@ -530,14 +530,16 @@ export function rebind(action, entryID, newCombo) {
 
     if (debug) console.log("action to rebind", action, opt.combo[entryID]);
 
-
+    //the timeout seems to be necessary due to racing conditions, so that events that register too early still get a change
+    setTimeout(function(){
     //iterate over all registered elements and bind the input combination to it
-    opt.elements.forEach(function (opt0) {
+        opt.elements.forEach(function (opt0) {
         bindSingleCombo(opt0, opt.combo[entryID])
-    })
+        })
 
+        _events.emit("change", {type: "rebind", action, combo: newCombo, previous: prevCombo})
 
-    _events.emit("change", {type: "rebind", action, combo: newCombo, previous: prevCombo})
+    },500)
 
 
 }

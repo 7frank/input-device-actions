@@ -78,6 +78,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
         log("trying to rebind to ctrl+enter ...")
     rebind("hello-action", 0, "ctrl+enter")
 
+//TODO we are currently unbinding all mousetrap events for( elements) which interferes with our overall goal to be able to have multiple combos per action
+
 
 
 });
