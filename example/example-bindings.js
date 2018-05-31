@@ -1,4 +1,4 @@
-import {getRegistered, Hotkeys} from "../src/index";
+import {getRegistered, Hotkeys, rebind} from "../src/index";
 import {createHTML, createRect, log, logHotkeyList} from "./example-utils";
 import * as _ from "lodash";
 
@@ -6,6 +6,11 @@ import * as _ from "lodash";
 document.addEventListener("DOMContentLoaded", function(event) {
 
     logHotkeyList()
+
+    Hotkeys.onChange(function(){
+        log("rebind ok")
+           console.log("rebind ok",arguments)
+    })
 
 
 //TODO create sample page with vue.js
@@ -15,7 +20,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 //bind the action to ctrl+space as default trigger
 //deprecated work flow
 //Hotkeys("hello-action", "ctrl+space", hello)
-
+    Hotkeys.setDebug(true)
 
     Hotkeys.register("hello-action", "ctrl+space")
 
@@ -65,6 +70,13 @@ document.addEventListener("DOMContentLoaded", function(event) {
         log("hello targetWithinTargetT")
     })
 
+
+    //-------------------------
+
+
+
+        log("trying to rebind to ctrl+enter ...")
+    rebind("hello-action", 0, "ctrl+enter")
 
 
 

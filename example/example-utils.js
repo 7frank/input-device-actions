@@ -56,7 +56,7 @@ function logHotkeyList() {
 export
 function createRect(name,top,left) {
 
-    return createHTML(`<div  style='position:absolute;top:${top};left:${left};border:2px solid darkslategray;background-color:mediumslateblue'>${name}</div>`)
+    return createHTML(`<div id="${name}" style='position:absolute;top:${top};left:${left};border:2px solid darkslategray;background-color:mediumslateblue'>${name}</div>`)
 }
 
 
