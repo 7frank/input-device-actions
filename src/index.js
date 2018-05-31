@@ -126,7 +126,7 @@ export function Hotkeys(target = window) {
 
                 if (debug) console.log("applyHandlers", options, options.combo, target)
                 bindAllCombos(options, options.combo)
-                // bindSingleCombo(options,options.combo)
+
 
             }
 
@@ -332,9 +332,8 @@ function bindAllCombos(options, comboParams, target) {
  *
  * @param opt
  * @param target - FIXME this value changes for "live" bound objects .. this interferes with unbinding as it is of now, which unbinds the options.target only
- * @param isRebind - TODO this param is meant to prevent multiple rebinds of the action itself when combos are rebound
  */
-function bindSingleCombo(opt, comboParam, isRebind = false) {
+function bindSingleCombo(opt, comboParam) {
 
     if (comboParam.combo == null) {
 
@@ -414,26 +413,39 @@ function bindSingleCombo(opt, comboParam, isRebind = false) {
     //------------------------------------------------------
     /**
      * Add action listener
-     * TODO work in progress only partially using target and ignoring selector
+     * TODO work in progress, only partially using target and ignoring selector
+     * TODO also make the result work without knowing if first or second exists
+     * (up/down does not exist for every device and generates some problems this way when actions are registered based on the assumption
+     * that first and second get passed)
      */
-    if (isRebind)
-        opt.target.addEventListener(opt.action, function (e) {
+
+    var actionHandler = function actionHandler(e) {
 
 
-            if (!hasSecondHandler(opt)) {
+        if (!hasSecondHandler(opt)) {
 
-                // if (e.detail.second)
+            // if (e.detail.second)
+            opt.handler.apply(this, arguments)
+        }
+        else {
+
+            if (e.detail.first)
                 opt.handler.apply(this, arguments)
-            }
-            else {
+            if (e.detail.second)
+                opt.extra.apply(this, arguments)
+        }
 
-                if (e.detail.first)
-                    opt.handler.apply(this, arguments)
-                if (e.detail.second)
-                    opt.extra.apply(this, arguments)
-            }
+    }
 
-        })
+    //fixing multiple bindings by keeping a map attached
+    if (!opt.target.__actions__) opt.target.__actions__ = {}
+    //opt.target.removeEventListener(opt.action,actionHandler) //removing doesn't work ..
+    if (!opt.target.__actions__[opt.action]) {
+
+        opt.target.addEventListener(opt.action, actionHandler)
+        opt.target.__actions__[opt.action] = true
+    }
+
     //------------------------------------------------------
 
 
@@ -506,16 +518,12 @@ export function rebind(action, entryID, newCombo) {
     var opt = getActionByName(action);
 
 
-
-
-
     var prevCombo = opt.combo[entryID]
 
     if (typeof prevCombo != "object") console.error("no combo found for params", action, entryID)
 
 //unbind previous instances
     unbind(opt, prevCombo)
-
 
 
     opt.combo[entryID] = convertComboParams(newCombo)[0]
@@ -525,7 +533,7 @@ export function rebind(action, entryID, newCombo) {
 
     //iterate over all registered elements and bind the input combination to it
     opt.elements.forEach(function (opt0) {
-        bindSingleCombo(opt0, opt.combo[entryID], true)
+        bindSingleCombo(opt0, opt.combo[entryID])
     })
 
 
