@@ -12,6 +12,12 @@ document.addEventListener("DOMContentLoaded", function(event) {
            console.log("rebind ok",arguments)
     })
 
+    Hotkeys.onAction(function(e){
+        log("action triggered action",e.type,"with combo" ,e.detail.combo.combo)
+        console.log("action triggered",e.type,e.detail.combo.combo)
+    })
+
+
 
 //TODO create sample page with vue.js
 

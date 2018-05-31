@@ -274,6 +274,11 @@ Hotkeys.onChange = function (handler) {
 
 };
 
+
+Hotkeys.onAction = function (handler) {
+    _events.on("action", handler)
+};
+
 Hotkeys.getRegistered = getRegistered;
 
 
@@ -364,7 +369,8 @@ function bindSingleCombo(opt, comboParam) {
                 detail: {
                     isActionEvent: true,
                     first: isFirstHandler,
-                    second: !isFirstHandler
+                    second: !isFirstHandler,
+                    combo:comboParam
                 }
             });
             //if (debug) console.log("createCustomActionEvent", e.target, event)
@@ -434,6 +440,9 @@ function bindSingleCombo(opt, comboParam) {
             if (e.detail.second)
                 opt.extra.apply(this, arguments)
         }
+
+
+        _events.emit("action", e)
 
     }
 
