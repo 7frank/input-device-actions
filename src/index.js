@@ -17,6 +17,8 @@
  * TODO integrate HI instead "https://github.com/liftoff/HumanInput"
  * TODO support mouse clicks and meta keys
  *
+ *
+ *
  *  see {@link https://github.com/fernandojsg/aframe-input-mapping-component} for thoughts
  *  TODO contact author on potential things to include
  */
@@ -24,15 +26,14 @@
 //import "./interactions"
 
 import {onElementChange} from "../listeners"
+import * as _ from 'lodash';
 import {assignIn as extend, forEach} from 'lodash';
+//import $ from 'jquery';
+import Emitter from 'tiny-emitter';
 
 
-import $ from 'jquery';
 import {getMousetrapInstance} from "./mousetrap-wrapper";
-import {getKJSInstance} from "./keypress-js-wrapper";
 import {hasSecondHandler} from "./utils";
-import {getHumanInputInstance} from "./human-input-wrapper";
-import * as _ from "lodash";
 
 /**
  * will add additional handlers to be able to send keyboard events to target
@@ -55,10 +56,12 @@ function fixFocusAndOtherThingsForNow(target) {
 
 }
 
+var debug = false
 
 var _keys = {};
 var _already_set_combos = {};
-var _events = $({});
+//var _events = $({});
+var _events = new Emitter();
 
 /**
  *
@@ -113,7 +116,7 @@ export function Hotkeys(target = window) {
 
 
             //TODO refactor
-            defaults.elements.push(options.el)
+            defaults.elements.push(options)
 
 
             //---------------------------------
@@ -121,9 +124,9 @@ export function Hotkeys(target = window) {
 
             function applyHandlers(target) {
 
-                console.log("applyHandlers", options, options.combo, target)
-                bindAllCombos(options, options.combo, target)
-                // bindSingleCombo(options,options.combo,target)
+                if (debug) console.log("applyHandlers", options, options.combo, target)
+                bindAllCombos(options, options.combo)
+                // bindSingleCombo(options,options.combo)
 
             }
 
@@ -134,7 +137,7 @@ export function Hotkeys(target = window) {
             if (options.selector != null)
                 onElementChange(options.target, options.selector, function onTargetChanged(arr) {
 
-                    console.log("hotkeys target ...", arguments);
+                    if (debug) console.log("hotkeys target ...", arguments);
 
                     applyHandlers(arr[0].added[0])
 
@@ -154,6 +157,13 @@ export function Hotkeys(target = window) {
     }
 
 }
+
+
+Hotkeys.setDebug = function (doDebug) {
+    debug = doDebug
+
+}
+
 
 /**
  * @param action -  TODO action should contain the category string default.sample-action
@@ -223,7 +233,7 @@ Hotkeys.register = function (action, combo, options) {
     //--------------------------------
 
 
-    _events.trigger("change", [])
+    _events.emit("change", {type: "register", action, combo})
 
 
 }
@@ -265,7 +275,6 @@ Hotkeys.onChange = function (handler) {
 };
 
 Hotkeys.getRegistered = getRegistered;
-
 
 
 /**
@@ -312,7 +321,7 @@ function convertComboParams(comboParams) {
 function bindAllCombos(options, comboParams, target) {
     _.each(comboParams, function (comboParam, k) {
 
-        bindSingleCombo(options, comboParam, target)
+        bindSingleCombo(options, comboParam)
 
     })
 }
@@ -323,8 +332,9 @@ function bindAllCombos(options, comboParams, target) {
  *
  * @param opt
  * @param target - FIXME this value changes for "live" bound objects .. this interferes with unbinding as it is of now, which unbinds the options.target only
+ * @param isRebind - TODO this param is meant to prevent multiple rebinds of the action itself when combos are rebound
  */
-function bindSingleCombo(opt, comboParam, target) {
+function bindSingleCombo(opt, comboParam, isRebind = false) {
 
     if (comboParam.combo == null) {
 
@@ -358,7 +368,7 @@ function bindSingleCombo(opt, comboParam, target) {
                     second: !isFirstHandler
                 }
             });
-            //console.log("createCustomActionEvent", e.target, event)
+            //if (debug) console.log("createCustomActionEvent", e.target, event)
             // val.dispatchEvent(event)
             e.target.dispatchEvent(event);
 
@@ -400,37 +410,37 @@ function bindSingleCombo(opt, comboParam, target) {
         // return res
 
     }
+
     //------------------------------------------------------
     /**
      * Add action listener
      * TODO work in progress only partially using target and ignoring selector
-     * FIXME listener is called once more every time it is triggered
      */
-    opt.target.addEventListener(opt.action, function (e) {
+    if (isRebind)
+        opt.target.addEventListener(opt.action, function (e) {
 
 
+            if (!hasSecondHandler(opt)) {
 
-        if (!hasSecondHandler(opt)) {
-
-           // if (e.detail.second)
+                // if (e.detail.second)
                 opt.handler.apply(this, arguments)
-        }
-        else {
+            }
+            else {
 
-            if (e.detail.first)
-                opt.handler.apply(this, arguments)
-            if (e.detail.second)
-                opt.extra.apply(this, arguments)
-        }
+                if (e.detail.first)
+                    opt.handler.apply(this, arguments)
+                if (e.detail.second)
+                    opt.extra.apply(this, arguments)
+            }
 
-    })
+        })
     //------------------------------------------------------
 
 
 //creating an instance to track unbinds and stuff @see https://github.com/ccampbell/mousetrap/issues/256
     var instance = opt.el;
 
-//console.log(comboParam.combo.toLowerCase(),opt.handler)
+//if (debug) console.log(comboParam.combo.toLowerCase(),opt.handler)
 //NOTE: make sure that the ctrl sequence is lowercase, otherwise mousetrap will ignore it completely
     instance.bind(comboParam.combo.toLowerCase(), handlerWrapper, handlerWrapper2)
 
@@ -463,7 +473,14 @@ function unbind(opt, prevCombo) {
 
     var instance = opt.el;
 
-    instance.unbind(prevCombo.combo.toLowerCase())
+
+    opt.elements.forEach(opt0 => {
+        if (debug) console.log("unbind", opt0, prevCombo, opt0.el._instance.target)
+        opt0.el.unbind(prevCombo.combo.toLowerCase())
+    })
+
+
+    //instance.unbind(prevCombo.combo.toLowerCase())
 
 }
 
@@ -475,7 +492,7 @@ function unbind(opt, prevCombo) {
  *
  *
  * @param action
- * @param {number} entryID - the id of the entry within the array
+ * @param {number} entryID - the id of the entry to select within the combo array
  * @param newCombo
  */
 export function rebind(action, entryID, newCombo) {
@@ -488,38 +505,31 @@ export function rebind(action, entryID, newCombo) {
     _already_set_combos[newCombo] = action;
     var opt = getActionByName(action);
 
-    //FIXME  !!! since 1.0.0 el is not set and will fail
-    //it is probably best to either keep a list of bound elements within the global options or have it stored somewhere similar
 
 
-    var instance = opt.el;
 
 
     var prevCombo = opt.combo[entryID]
 
     if (typeof prevCombo != "object") console.error("no combo found for params", action, entryID)
 
-    /*
-        if (!hasSecondHandler(opt)) {
-            instance.unbind(prevCombo.combo);
-        } else {
-            instance.unbind(prevCombo.combo, 'keydown');
-            instance.unbind(prevCombo.combo, 'keyup');
-        }
-    */
+//unbind previous instances
     unbind(opt, prevCombo)
 
 
-    //opt.combo = newCombo;
+
     opt.combo[entryID] = convertComboParams(newCombo)[0]
 
-    //console.log("action to rebind", action, opt.combo[entryID]);
+    if (debug) console.log("action to rebind", action, opt.combo[entryID]);
 
 
-    //TODO check if timeoout still necessary
-    setTimeout(function () {
-        bindSingleCombo(opt, opt.combo[entryID])
-    }, 500)
+    //iterate over all registered elements and bind the input combination to it
+    opt.elements.forEach(function (opt0) {
+        bindSingleCombo(opt0, opt.combo[entryID], true)
+    })
+
+
+    _events.emit("change", {type: "rebind", action, combo: newCombo, previous: prevCombo})
 
 
 }
@@ -562,7 +572,7 @@ export function resetActionCombosToDefault(action, comboID) {
     options.combo = _.compact(options.combo);
 
 
-    _events.trigger("change", [])
+    _events.emit("change", {type: "reset-to-defaults"})
 
 
 }
@@ -584,7 +594,7 @@ export function addComboForAction(action) {
     // options.defaults.push(cloneObject(param))
 
 
-    _events.trigger("change", [])
+    _events.emit("change", {type: "create-placeholder"})
 
     return param
 
