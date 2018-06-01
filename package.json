@@ -1,12 +1,14 @@
 {
   "name": "@nk11/keyboard-interactions",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "A wrapper for mousetrap and other human interface libraries with additional actions to be able to change hotkeys for actions via dialog.",
   "author": "Frank Reimann (https://github.com/frank1147)",
   "main": "src/index.js",
   "scripts": {
-    "webpack": "webpack",
-    "start": "http-server",
+    "build-test-env": "webpack",
+    "build": "npm run build-test-env",
+    "start-test-env": "http-server",
+    "start": "npm run start-test-env",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
