@@ -104,10 +104,43 @@ export function Hotkeys(target = window) {
             //init the wrapper
 
             //FIXME have one options object or input device instance per target
+
+         /*
+            options.handlerInstances={}
+
+            // have a descriptive  getter instead of the "el" param
+            options.getElFor_Options_Combo=function(combo)
+            {
+                this.handlerInstances[combo.type]
+
+            }
+
+            options.combo.forEach( function(c) {
+
+            var factory;
+            switch(c.type)
+            {
+            case "keyboard":  factory=getMousetrapInstance;break
+            case "human-input":factory=getHumanInputInstance;break
+            default:console.error("unknown type")
+            }
+
+
+            if (!options.handlerInstances[c.type])
+                options.handlerInstances[c.type]=factory(options)
+
+            })
+            */
+
             options.el = getMousetrapInstance(options)
+
+            //TODO check what problems occurred with this library
+            // - startRecording stopRecording where too verbose and thus resulted in to bloated descriptions
+            // - TODO create some test case for it
 
 
             // options.el = getHumanInputInstance(options)
+            //problems with identifying combos from
 
 
             //NOTE: keyboard.js does have problems with special characters like öä# on non english keyboards

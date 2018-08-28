@@ -5,7 +5,12 @@ import * as _ from "lodash";
 
 document.addEventListener("DOMContentLoaded", function(event) {
 
+    window.HK=Hotkeys
+
+
     logHotkeyList()
+
+
 
     Hotkeys.onChange(function(){
         log("rebind ok")
