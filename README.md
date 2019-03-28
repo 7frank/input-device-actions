@@ -16,13 +16,24 @@
 This library contains a simple wrapper for *different* input methods. By introducing an 'action' to bind multiple input combos plus their handlers with it a better customisation by the user may be achieved.
 
 For example:
-```javascript
-function hello()
-{    console.log("hello world") }
 
-//bind the action to ctrl+space as default trigger
-Hotkeys("hello-action", "ctrl+space", hello)
+```javascript
+     
+        Hotkeys.register("unique-action-name", 'space', {
+            //target:window, // the default target that watches events 
+            category: "default",
+            description: "if user presses this combination all listeners will be triggered"
+        });
+
+        // add listeners somewhere 
+        Hotkeys(/*target*/) // change the target to another dom element to restrict targets
+        .on("unique-action-name", (evt) => {
+            console.log("action was triggerd",evt)
+         
+        });
 ``` 
+
+
 
 For the time being this is not meant to be a stand alone library
 But rather as a backend for a compatible GUI.
