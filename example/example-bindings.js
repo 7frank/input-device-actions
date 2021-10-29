@@ -1,107 +1,80 @@
-import {getRegistered, Hotkeys, rebind} from "../src/index";
-import {createHTML, createRect, log, logHotkeyList} from "./example-utils";
+import { getRegistered, Hotkeys, rebind } from "../src/index";
+import { createHTML, createRect, log, logHotkeyList } from "./example-utils";
 import * as _ from "lodash";
 
+document.addEventListener("DOMContentLoaded", function (event) {
+  window.HK = Hotkeys;
 
-document.addEventListener("DOMContentLoaded", function(event) {
+  logHotkeyList();
 
-    window.HK=Hotkeys
+  Hotkeys.onChange(function () {
+    log("rebind ok");
+    console.log("rebind ok", arguments);
+  });
 
+  Hotkeys.onAction(function (e) {
+    log("action triggered action", e.type, "with combo", e.detail.combo.combo);
+    console.log("action triggered", e.type, e.detail.combo.combo);
+  });
 
-    logHotkeyList()
+  //TODO create sample page with vue.js
 
+  //bind the action to ctrl+space as default trigger
+  //deprecated work flow
+  //Hotkeys("hello-action", "ctrl+space", hello)
+  Hotkeys.setDebug(true);
 
+  Hotkeys.register("hello-action", "ctrl+space");
 
-    Hotkeys.onChange(function(){
-        log("rebind ok")
-           console.log("rebind ok",arguments)
-    })
+  Hotkeys(window).on("hello-action", function (e) {
+    e.stopPropagation();
 
-    Hotkeys.onAction(function(e){
-        log("action triggered action",e.type,"with combo" ,e.detail.combo.combo)
-        console.log("action triggered",e.type,e.detail.combo.combo)
-    })
+    console.log(">>>", arguments);
+    log("hello window");
+  });
 
+  var target1 = createRect("target1", 100, 300);
+  document.body.appendChild(target1);
 
+  Hotkeys(target1).on("hello-action", function (e) {
+    e.stopPropagation();
+    console.log(">>>", arguments);
+    log("hello target1");
+  });
 
-//TODO create sample page with vue.js
+  var targetWithinTarget = createRect("targetWithinTarget", 50, 50);
+  target1.appendChild(targetWithinTarget);
 
+  Hotkeys(targetWithinTarget).on("hello-action", function (e) {
+    e.stopPropagation();
+    console.log(">>>", arguments);
+    log("hello targetWithinTarget");
+  });
 
+  var targetWithinTargetT = createRect("targetWithinTargetT", 50, 50);
+  targetWithinTarget.appendChild(targetWithinTargetT);
 
-//bind the action to ctrl+space as default trigger
-//deprecated work flow
-//Hotkeys("hello-action", "ctrl+space", hello)
-    Hotkeys.setDebug(true)
+  Hotkeys(targetWithinTargetT).on(
+    "hello-action",
+    function (e) {
+      e.stopPropagation();
+      console.log(">>>down", arguments);
+      log("hello targetWithinTargetT");
+    },
+    function (e) {
+      e.stopPropagation();
+      console.log(">>>up", arguments);
+      log("hello targetWithinTargetT");
+    }
+  );
 
-    Hotkeys.register("hello-action", "ctrl+space")
+  //-------------------------
 
+  log("trying to rebind to ctrl+enter ...");
+  rebind("hello-action", 0, "ctrl+enter");
 
-    Hotkeys(window).on("hello-action",   function(e) {
-        e.stopPropagation()
-
-        console.log(">>>",arguments)
-        log("hello window")
-    })
-
-    var target1= createRect("target1",100,300)
-    document.body.appendChild(target1)
-
-
-
-    Hotkeys(target1).on("hello-action", function(e) {
-        e.stopPropagation()
-        console.log(">>>",arguments)
-        log("hello target1")
-    })
-
-
-    var targetWithinTarget= createRect("targetWithinTarget",50,50)
-    target1.appendChild(targetWithinTarget)
-
-
-    Hotkeys(targetWithinTarget).on("hello-action", function(e) {
-        e.stopPropagation()
-        console.log(">>>",arguments)
-        log("hello targetWithinTarget")
-    })
-
-
-
-    var targetWithinTargetT= createRect("targetWithinTargetT",50,50)
-    targetWithinTarget.appendChild(targetWithinTargetT)
-
-
-    Hotkeys(targetWithinTargetT).on("hello-action", function(e) {
-        e.stopPropagation()
-        console.log(">>>down",arguments)
-        log("hello targetWithinTargetT")
-    },function(e) {
-        e.stopPropagation()
-        console.log(">>>up",arguments)
-        log("hello targetWithinTargetT")
-    })
-
-
-    //-------------------------
-
-
-
-        log("trying to rebind to ctrl+enter ...")
-    rebind("hello-action", 0, "ctrl+enter")
-
-//TODO we are currently unbinding all mousetrap events for( elements) which interferes with our overall goal to be able to have multiple combos per action
-
-
-
+  //TODO we are currently unbinding all mousetrap events for( elements) which interferes with our overall goal to be able to have multiple combos per action
 });
-
-
-
-
-
-
-
-
 
 /*
 

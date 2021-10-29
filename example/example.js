@@ -1,4 +1,1 @@
-import "./example-bindings"
-
-
-
+import "./example-bindings";
