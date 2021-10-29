@@ -394,11 +394,14 @@ function bindSingleCombo(opt, comboParam) {
 
         forEach(el, function (val) {
 
+            // fix path for ff + chrome
+            var path = e.path || (e.composedPath && e.composedPath());
+
             var event = new CustomEvent(opt.action, {
                 bubbles: true,
                 target: val,
-                path: e.path,
-                currentTarget: e.path[0],
+                path: path,
+                currentTarget: path[0],
                 detail: {
                     isActionEvent: true,
                     first: isFirstHandler,
