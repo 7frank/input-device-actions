@@ -1,7 +1,7 @@
 import $ from "cash-dom";
 
 import { rebind } from "../src/index";
-import { createKeybindingEditor } from "./createKeybindingEditor";
+import { createKeybindingEditor } from "../gui/createKeybindingEditor";
 
 $("<link/>")
   .attr({

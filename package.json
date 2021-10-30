@@ -1,45 +1,52 @@
 {
   "name": "@nk11/keyboard-interactions",
-  "version": "1.0.8",
+  "version": "2.0.0",
   "description": "A wrapper for mousetrap and other human interface libraries with additional actions to be able to change hotkeys for actions via dialog.",
   "author": "Frank Reimann (https://github.com/frank1147)",
-  "main": "src/index.js",
+  "private": true,
   "scripts": {
-    "build-test-env": "webpack",
-    "build": "npm run build-test-env",
-    "start-test-env": "http-server",
-    "start": "npm run start-test-env",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "start": "sirv public --no-clear",
+    "check": "svelte-check --tsconfig ./tsconfig.json",
     "format": "prettier --write ."
   },
+  "license": "MIT",
   "keywords": [
     "keymap",
     "mousetrap",
     "hotkeys"
   ],
-  "license": "MIT",
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^17.0.0",
+    "@rollup/plugin-node-resolve": "^11.0.0",
+    "rollup": "^2.3.4",
+    "rollup-plugin-css-only": "^3.1.0",
+    "rollup-plugin-livereload": "^2.0.0",
+    "rollup-plugin-svelte": "^7.0.0",
+    "rollup-plugin-terser": "^7.0.0",
+    "svelte": "^3.0.0",
+    "svelte-check": "^2.0.0",
+    "svelte-preprocess": "^4.0.0",
+    "@rollup/plugin-typescript": "^8.0.0",
+    "typescript": "^4.0.0",
+    "tslib": "^2.0.0",
+    "@tsconfig/svelte": "^2.0.0"
+  },
   "dependencies": {
-    "@babel/preset-env": "^7.16.0",
+    "sirv-cli": "^1.0.0",
     "humaninput": "^1.1.15",
     "key-event-to-string": "^1.2.0",
     "keypress.js": "^2.1.5",
     "lodash": "^4.17.21",
     "mousetrap": "^1.6.5",
     "mutation-summary": "^1.0.0",
-    "tiny-emitter": "^2.1.0"
+    "tiny-emitter": "^2.1.0",
+    "cash-dom": "^8.1.0",
+    "prettier": "^2.4.1"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/frank1147/input-device-actions.git"
-  },
-  "devDependencies": {
-    "@babel/core": "^7.16.0",
-    "babel-loader": "^8.2.3",
-    "babel-preset-env": "^1.7.0",
-    "cash-dom": "^8.1.0",
-    "html-webpack-plugin": "^5.5.0",
-    "prettier": "^2.4.1",
-    "webpack": "^5.5.0",
-    "webpack-cli": "^4.9.1"
+    "url": "git://github.com/7frank/input-device-actions.git"
   }
 }
