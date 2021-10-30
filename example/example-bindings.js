@@ -18,7 +18,7 @@ $(loadExamples);
 function onHelloAction(e) {
   e.stopPropagation();
 
-  log("triggered hello-action targetWithinTargetT");
+  log("triggered hello-action on target");
 
   $(e.target).css("background-color", randomRGB());
 }
@@ -33,9 +33,9 @@ function loadExamples(event) {
   /**
    * attach listener when an action is bound to a new key combo
    */
-  Hotkeys.onChange(function () {
-    log("rebind ok");
-    console.log("rebind ok", arguments);
+  Hotkeys.onChange(function (combo) {
+    log("rebind to: " + JSON.stringify(combo));
+    console.log("rebind to", arguments);
   });
 
   /**
@@ -56,9 +56,7 @@ function loadExamples(event) {
   });
 
   var help;
-  Hotkeys(window).on("help-action", function (e) {
-    e.stopPropagation();
-
+  function toggleHelp() {
     if (help) {
       help.remove();
       help = undefined;
@@ -66,12 +64,21 @@ function loadExamples(event) {
       help = createHelp();
       $("body").prepend(help);
     }
+  }
+
+  Hotkeys(window).on("help-action", function (e) {
+    e.stopPropagation();
+    toggleHelp();
   });
 
   /**
    * register an action that shows the keybinding editor
    */
-  Hotkeys.register("hello-action", "ctrl+space");
+  Hotkeys.register(
+    "hello-action",
+    "ctrl+space",
+    {description:"set random color for element"}
+  );
 
   const [target1, targetWithinTarget, targetWithinTargetT] =
     createExampleTargets();

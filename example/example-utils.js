@@ -1,6 +1,6 @@
 import $ from "cash-dom";
 
-import { getRegistered,rebind, } from "../src/index";
+import { getRegistered, rebind } from "../src/index";
 
 $("<link/>")
   .attr({
@@ -10,47 +10,21 @@ $("<link/>")
   })
   .appendTo("head");
 
-export const createHTML = (domstring) => {
-  if (domstring == null) throw new Error("needs param");
-  let html = new DOMParser().parseFromString(domstring, "text/html");
-  return html.body.firstChild;
-};
+let container = $(
+  "<div style='position:relative; border-top:2px solid black'>"
+);
 
-let container = createHTML("<div style='position:relative;'>");
-
-document.addEventListener("DOMContentLoaded", function (event) {
-  document.body.appendChild(container);
-});
+$("body").append(container);
 
 export const log = (...args) => {
   let str = args.join(" ");
-  let entry = createHTML(`<div>${str}</div>`);
-  container.appendChild(entry);
+  let entry = $(`<div>${str}</div>`);
+  container.prepend(entry);
 };
-
-//TODO
-export const createSampleButton = (options) => {
-  let entry = createHTML(`<button>${options.action}</button>`);
-
-  entry.addEventListener("click", function () {
-    log("TODO ...");
-  });
-
-  container.appendChild(entry);
-};
-
-export function logHotkeyList() {
-  let entries = getRegistered();
-  log("------------Hotkeys & Actions defined--------------");
-  _.each(entries, function (val) {
-    log(val.action, JSON.stringify(val.combo));
-  });
-  log("------------Hotkeys & Actions end--------------");
-}
 
 export function createRect(name, top, left) {
   return $(
-    `<div id="${name}" style='position:relative;top:${top};left:${left};border:2px solid darkslategray;padding:1em;background-color:mediumslateblue'>${name}</div>`
+    `<div style='position:relative;top:${top};left:${left};border:2px solid darkslategray;padding:1em;background-color:mediumslateblue'>${name}</div>`
   );
 }
 
@@ -75,7 +49,6 @@ export function createHelp() {
   //log("trying to rebind to ctrl+c ...");
   //TODO we are currently unbinding all mousetrap events for( elements) which interferes with our overall goal to be able to have multiple combos per action
   //rebind("hello-action", 0, "ctrl+c");
-
 
   const rows = _.map(entries, (val) =>
     $(`<tr>
@@ -120,13 +93,19 @@ export function randomRGB() {
 }
 
 export function createExampleTargets() {
-  var target1 = createRect("target1", 100, 300).css({ margin: "18rem" });
-  $("body").prepend(target1);
 
-  var targetWithinTarget = createRect("targetWithinTarget", 50, 50);
+  var header = $("<h3>Press 'h' for help</h3>")
+
+  var target1 = createRect("use the key combo for 'hello-action' to toggle my color when hovering ", 100, 300).css({
+    margin: "2rem",
+    marginLeft: "18rem",
+  });
+  $("body").prepend(header,target1);
+
+  var targetWithinTarget = createRect("or here (you can change the key combo in the editor when pressing 'h')", 50, 50);
   target1.append(targetWithinTarget);
 
-  var targetWithinTargetT = createRect("targetWithinTargetT", 50, 50);
+  var targetWithinTargetT = createRect("I will toggle twice - when pressing & when releasing the combo keys", 50, 50);
   targetWithinTarget.append(targetWithinTargetT);
 
   return [target1, targetWithinTarget, targetWithinTargetT];
