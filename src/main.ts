@@ -1,7 +1,7 @@
 import App from "./App.svelte";
 
 async function main() {
-  const { loadExamples } = await import("./example/example-bindings");
+  const { loadExamples } = await import("./example/example");
 
   loadExamples();
 

@@ -1,1 +1,1 @@
-import "./example-bindings";
+export * from  "./example-bindings";
