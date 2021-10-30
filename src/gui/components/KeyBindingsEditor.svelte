@@ -1,5 +1,5 @@
 <script>
-  import { Button, Col, Row } from "sveltestrap";
+  import { Button, Col, Row, Table } from "sveltestrap";
   import {
     getRegistered,
     isBound,
@@ -33,7 +33,7 @@
 </svelte:head>
 
 <div>
-  <table class="table">
+  <Table>
     <thead>
       <tr>
         <th scope="col">action</th>
@@ -66,7 +66,7 @@
         </tr>
       {/each}
     </tbody>
-  </table>
+  </Table>
   <Row>
     <Col>
       <Button color="primary" outline>Hello World!</Button>

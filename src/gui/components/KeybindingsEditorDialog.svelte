@@ -19,8 +19,7 @@
 </script>
 
 <main>
-  <Button color="danger" on:click={toggle}>Open Modal</Button>
-  <Modal isOpen={open} {toggle}>
+  <Modal isOpen={open} {toggle} size="xl">
     <ModalHeader {toggle}>
       <h2>Change your key bindings</h2>
     </ModalHeader>
@@ -38,7 +37,6 @@
   main {
     text-align: center;
     padding: 1em;
-    max-width: 240px;
     margin: 0 auto;
   }
 
@@ -47,11 +45,5 @@
     text-transform: uppercase;
 
     font-weight: 100;
-  }
-
-  @media (min-width: 640px) {
-    main {
-      max-width: none;
-    }
   }
 </style>
