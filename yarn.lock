@@ -2202,6 +2202,11 @@ json5@^2.1.2:
   dependencies:
     minimist "^1.2.5"
 
+key-event-to-string@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/key-event-to-string/-/key-event-to-string-1.2.0.tgz#6cf2ed0d246fe2ae3ff5e7751fd2d66764437bf3"
+  integrity sha512-XtYtvEp/f6WaYgNCOdRUuE/cTqoQXU7TK62rmGsA4ylRGvvFRlBsItkR9f+/MEaVzTAIqBDCU1Zt/67lv7L1iA==
+
 keypress.js@^2.1.5:
   version "2.1.5"
   resolved "https://registry.yarnpkg.com/keypress.js/-/keypress.js-2.1.5.tgz#38f96d1ded85f56115a0cafd9908e727bcd1b348"

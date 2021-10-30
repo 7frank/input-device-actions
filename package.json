@@ -21,6 +21,7 @@
   "dependencies": {
     "@babel/preset-env": "^7.16.0",
     "humaninput": "^1.1.15",
+    "key-event-to-string": "^1.2.0",
     "keypress.js": "^2.1.5",
     "lodash": "^4.17.21",
     "mousetrap": "^1.6.5",
