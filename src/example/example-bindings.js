@@ -51,7 +51,7 @@ function loadExamples(event) {
   /**
    * register an action that shows the keybinding editor
    */
-  Hotkeys.register("help-action", ["h","f1"], {
+  Hotkeys.register("help-action", ["h", "f1"], {
     description: "toggles a the keybinding editor dialog",
   });
 

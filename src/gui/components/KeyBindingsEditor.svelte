@@ -9,10 +9,12 @@
   isBound,
   rebind,
   addComboForAction,
-  resetActionCombosToDefault,
+  resetActionCombosToDefault,Hotkeys
 } from "../../core";
-    let entries = Object.values(getRegistered());
-console.log("entries",entries)
+    let entries =[];
+
+    Hotkeys.onChange(()=> entries =Object.values(getRegistered()))
+
 
   </script>
   

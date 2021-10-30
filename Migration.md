@@ -7,7 +7,7 @@
   - Hotkeys(target).off(action_name,handler1,handler2)
     - are now the preferred way of binding actions
 
+### 1.0.0 => 2.0.0
 
-### 1.0.0 => 2.0.0    
-- migrating to rollup & svelte 
+- migrating to rollup & svelte
   - provide separete builds for core & svelte components
