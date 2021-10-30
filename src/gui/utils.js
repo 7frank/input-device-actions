@@ -1,4 +1,3 @@
-import $ from "cash-dom";
 import {
   getRegistered,
   isBound,

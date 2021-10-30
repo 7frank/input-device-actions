@@ -1,19 +1,8 @@
 import { Hotkeys } from "../core";
-import { createExampleTargets, log, randomRGB } from "./example-utils";
+import { randomRGB } from "./example-utils";
 import * as _ from "lodash";
-import $ from "cash-dom";
 
-/**
- *
- * an example action handler that changes the background color
- */
-function onHelloAction(e) {
-  e.stopPropagation();
-
-  log("triggered set-random-color-action on target");
-
-  $(e.target).css("background-color", randomRGB());
-}
+import { log } from "../example/Log.svelte";
 
 /**
  *
@@ -53,15 +42,4 @@ export function loadExamples(event) {
   Hotkeys.register("set-random-color-action", "ctrl+space", {
     description: "set random color for element",
   });
-
-  const [target1, targetWithinTarget, targetWithinTargetT] =
-    createExampleTargets();
-
-  Hotkeys(target1).on("set-random-color-action", onHelloAction);
-  Hotkeys(targetWithinTarget).on("set-random-color-action", onHelloAction);
-  Hotkeys(targetWithinTargetT).on(
-    "set-random-color-action",
-    onHelloAction,
-    onHelloAction
-  );
 }
