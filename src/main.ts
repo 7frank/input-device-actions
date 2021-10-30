@@ -1,6 +1,7 @@
 import App from './App.svelte';
-import "./example/example.js"
+const loadStuff=async () =>await import( "./example/example.js")
 
+loadStuff();
 
 const app = new App({
 	target: document.body,
