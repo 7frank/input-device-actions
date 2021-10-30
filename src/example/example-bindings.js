@@ -1,5 +1,4 @@
 import { Hotkeys } from "../core";
-import { randomRGB } from "./example-utils";
 import * as _ from "lodash";
 
 import { log } from "../example/Log.svelte";
