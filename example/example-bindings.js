@@ -18,7 +18,7 @@ $(loadExamples);
 function onHelloAction(e) {
   e.stopPropagation();
 
-  log("triggered hello-action on target");
+  log("triggered set-random-color-action on target");
 
   $(e.target).css("background-color", randomRGB());
 }
@@ -51,7 +51,7 @@ function loadExamples(event) {
   /**
    * register an action that shows the keybinding editor
    */
-  Hotkeys.register("help-action", "h", {
+  Hotkeys.register("help-action", ["h","f1"], {
     description: "toggles a the keybinding editor dialog",
   });
 
@@ -74,14 +74,18 @@ function loadExamples(event) {
   /**
    * register an action that shows the keybinding editor
    */
-  Hotkeys.register("hello-action", "ctrl+space", {
+  Hotkeys.register("set-random-color-action", "ctrl+space", {
     description: "set random color for element",
   });
 
   const [target1, targetWithinTarget, targetWithinTargetT] =
     createExampleTargets();
 
-  Hotkeys(target1).on("hello-action", onHelloAction);
-  Hotkeys(targetWithinTarget).on("hello-action", onHelloAction);
-  Hotkeys(targetWithinTargetT).on("hello-action", onHelloAction, onHelloAction);
+  Hotkeys(target1).on("set-random-color-action", onHelloAction);
+  Hotkeys(targetWithinTarget).on("set-random-color-action", onHelloAction);
+  Hotkeys(targetWithinTargetT).on(
+    "set-random-color-action",
+    onHelloAction,
+    onHelloAction
+  );
 }

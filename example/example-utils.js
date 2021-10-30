@@ -47,7 +47,7 @@ function createCard({
 export function createHelp() {
   //log("trying to rebind to ctrl+c ...");
   //TODO we are currently unbinding all mousetrap events for( elements) which interferes with our overall goal to be able to have multiple combos per action
-  //rebind("hello-action", 0, "ctrl+c");
+  //rebind("set-random-color-action", 0, "ctrl+c");
 
   const table = createKeybindingEditor();
 
@@ -68,7 +68,7 @@ export function createExampleTargets() {
   var header = $("<h3>Press 'h' for help</h3>");
 
   var target1 = createRect(
-    "use the key combo for 'hello-action' to toggle my color when hovering ",
+    "use the key combo for 'set-random-color-action' to toggle my color when hovering ",
     100,
     300
   ).css({

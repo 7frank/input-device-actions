@@ -1,6 +1,13 @@
 import $ from "cash-dom";
-import { getRegistered, isBound, rebind } from "../src/index";
+import {
+  getRegistered,
+  isBound,
+  rebind,
+  addComboForAction,
+  resetActionCombosToDefault,
+} from "../src/index";
 import * as event2stringProto from "key-event-to-string";
+import * as _ from "lodash";
 
 export function getElementFromEvent(e) {
   return e.currentTarget || (e.path && e.path[0]);
@@ -98,20 +105,36 @@ function onInputPress(event, id, action) {
   return false;
 }
 
+var isArrayEqual = function (x, y) {
+  return _(x).differenceWith(y, _.isEqual).isEmpty();
+};
+
 export function createKeybindingEditor() {
   let entries = getRegistered();
-  const rows = _.map(entries, (val) => {
+  const rows = _.map(entries, (t) => {
     const res = $(`<tr>
-        <td>${val.action}</td>
+        <td><span title=${t.action}>${t.title}</span></td>
         <td id="edit"></td>
-        <td>${val.description}</td>
+         
+        <td>${t.description}</td>
     </tr>`);
-    console.log(val);
-    var items = val.combo.map((tag, key) =>
-      createInputItem(tag, key, val.action)
+
+    var items = t.combo.map((tag, key) => createInputItem(tag, key, t.action));
+
+    const $addComboButton = $(`<button>add</button>`).on("click", () =>
+      addComboForAction(t.action)
     );
 
-    res.find("#edit").append(...items);
+    const $undoButton = !isArrayEqual(t.combo, t.defaults)
+      ? $('<span name="undo">undo</span>')
+          .prop(
+            "title",
+            "reset to defaults:" + t.defaults.map((el) => el.combo).join(" ")
+          )
+          .on("click", () => resetActionCombosToDefault(t.action))
+      : $('<span name="undo">undo</span>');
+
+    res.find("#edit").append(...items, $addComboButton, $undoButton);
     return res;
   });
 
@@ -122,8 +145,6 @@ export function createKeybindingEditor() {
       <th scope="col">action</th>
       <th scope="col">combo</th>
       <th scope="col">description</th>
-      <th scope="col">input new combo</th>
-      <th scope="col">save new combo</th>
     </tr>
   </thead>
   <tbody>
