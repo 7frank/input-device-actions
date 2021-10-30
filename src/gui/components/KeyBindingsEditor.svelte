@@ -67,9 +67,4 @@
       {/each}
     </tbody>
   </Table>
-  <Row>
-    <Col>
-      <Button color="primary" outline>Hello World!</Button>
-    </Col>
-  </Row>
 </div>

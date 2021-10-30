@@ -2,6 +2,7 @@
   import KeyBindingsEditor from "./gui/components/KeyBindingsEditor.svelte";
   import ModalDialog from "./gui/components/KeybindingsEditorDialog.svelte";
   import Log from "./example/Log.svelte";
+  import Examples from "./example/Examples.svelte";
 
   export let name: string;
 </script>
@@ -10,6 +11,10 @@
   <h1>KeyBindings - Editor {name}</h1>
   <h3>an exemplary implementation of a editor GUI</h3>
   <h3>Press 'h' for help</h3>
+
+  <div class="area">
+    <Examples />
+  </div>
 
   <ModalDialog><KeyBindingsEditor /></ModalDialog>
   <Log />
@@ -21,6 +26,17 @@
     padding: 1em;
     max-width: 240px;
     margin: 0 auto;
+  }
+
+  .area {
+    position: relative;
+
+    margin: 2em;
+    padding: 0em;
+
+    height: 600px;
+    border: 2px solid #999;
+    background-color: blanchedalmond;
   }
 
   h1 {

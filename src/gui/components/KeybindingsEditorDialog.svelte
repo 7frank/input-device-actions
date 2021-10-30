@@ -27,8 +27,8 @@
       <slot />
     </ModalBody>
     <ModalFooter>
-      <Button color="primary" on:click={toggle}>Do Something</Button>
-      <Button color="secondary" on:click={toggle}>Cancel</Button>
+      <!-- <Button color="primary" on:click={toggle}>Do Something</Button>
+      <Button color="secondary" on:click={toggle}>Cancel</Button> -->
     </ModalFooter>
   </Modal>
 </main>
