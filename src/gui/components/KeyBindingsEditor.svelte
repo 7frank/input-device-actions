@@ -8,9 +8,16 @@
     resetActionCombosToDefault,
     Hotkeys,
   } from "../../core";
+
+  import _ from "lodash";
+
   let entries = [];
 
   Hotkeys.onChange(() => (entries = Object.values(getRegistered())));
+
+  var isArrayEqual = function (x, y) {
+    return _(x).differenceWith(y, _.isEqual).isEmpty();
+  };
 </script>
 
 <svelte:head>
@@ -33,7 +40,19 @@
       {#each entries as t, i}
         <tr>
           <td><span title="${t.action}">{t.title}</span></td>
-          <td id="edit" />
+          <td id="edit">
+            <Button on:click={() => addComboForAction(t.action)}>add</Button>
+
+            {#if !isArrayEqual(t.combo, t.defaults)}
+              <Button
+                on:click={() => resetActionCombosToDefault(t.action)}
+                title={"reset to defaults:" +
+                  t.defaults.map((el) => el.combo).join(" ")}>undo</Button
+              >
+            {:else}
+              <Button disabled>undo</Button>
+            {/if}
+          </td>
           <td>{t.description}</td>
         </tr>
       {/each}
@@ -58,18 +77,7 @@
 
     var items = t.combo.map((tag, key) => createInputItem(tag, key, t.action));
 
-    const $addComboButton = $(`<button>add</button>`).on("click", () =>
-      addComboForAction(t.action)
-    );
 
-    const $undoButton = !isArrayEqual(t.combo, t.defaults)
-      ? $('<span name="undo">undo</span>')
-          .prop(
-            "title",
-            "reset to defaults:" + t.defaults.map((el) => el.combo).join(" ")
-          )
-          .on("click", () => resetActionCombosToDefault(t.action))
-      : $('<span name="undo">undo</span>');
 
     res.find("#edit").append(...items, $addComboButton, $undoButton);
     return res;
