@@ -1,25 +1,27 @@
+<script>
+  import { Button, Col, Row } from "sveltestrap";
+  import {
+    getRegistered,
+    isBound,
+    rebind,
+    addComboForAction,
+    resetActionCombosToDefault,
+    Hotkeys,
+  } from "../../core";
+  let entries = [];
+
+  Hotkeys.onChange(() => (entries = Object.values(getRegistered())));
+</script>
+
 <svelte:head>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css">
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css"
+  />
 </svelte:head>
 
-<script>
-    import { Button, Col, Row } from 'sveltestrap';
-    import {
-  getRegistered,
-  isBound,
-  rebind,
-  addComboForAction,
-  resetActionCombosToDefault,Hotkeys
-} from "../../core";
-    let entries =[];
-
-    Hotkeys.onChange(()=> entries =Object.values(getRegistered()))
-
-
-  </script>
-  
-  <div>
-    <table class="table">
+<div>
+  <table class="table">
     <thead>
       <tr>
         <th scope="col">action</th>
@@ -28,14 +30,13 @@
       </tr>
     </thead>
     <tbody>
-    	{#each entries as t, i}
-	    <tr>
-        <td><span title=${t.action}>{t.title}</span></td>
-        <td id="edit"></td>
-        <td>{t.description}</td>
-    </tr>
-
-	{/each}
+      {#each entries as t, i}
+        <tr>
+          <td><span title="${t.action}">{t.title}</span></td>
+          <td id="edit" />
+          <td>{t.description}</td>
+        </tr>
+      {/each}
     </tbody>
   </table>
   <Row>
@@ -43,7 +44,6 @@
       <Button color="primary" outline>Hello World!</Button>
     </Col>
   </Row>
-
 </div>
 
 <!-- 
