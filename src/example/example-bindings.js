@@ -1,4 +1,4 @@
-import { Hotkeys } from "../src/index";
+import { Hotkeys } from "../core";
 import {
   createRect,
   createExampleTargets,

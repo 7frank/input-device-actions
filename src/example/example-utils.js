@@ -1,6 +1,6 @@
 import $ from "cash-dom";
 
-import { rebind } from "../src/index";
+import { rebind } from "../core";
 import { createKeybindingEditor } from "../gui/createKeybindingEditor";
 
 $("<link/>")

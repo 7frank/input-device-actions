@@ -1,5 +1,5 @@
 import App from './App.svelte';
-
+import "./example/example.js"
 
 
 const app = new App({

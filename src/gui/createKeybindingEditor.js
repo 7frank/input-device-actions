@@ -5,9 +5,9 @@ import {
   rebind,
   addComboForAction,
   resetActionCombosToDefault,
-} from "../src/index";
+} from "../core";
 import * as event2stringProto from "key-event-to-string";
-import * as _ from "lodash";
+import _ from "lodash";
 
 export function getElementFromEvent(e) {
   return e.currentTarget || (e.path && e.path[0]);
