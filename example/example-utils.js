@@ -1,6 +1,14 @@
 import $ from "cash-dom";
 
-import { getRegistered } from "../src/index";
+import { getRegistered,rebind, } from "../src/index";
+
+$("<link/>")
+  .attr({
+    rel: "stylesheet",
+    type: "text/css",
+    href: "https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css",
+  })
+  .appendTo("head");
 
 export const createHTML = (domstring) => {
   if (domstring == null) throw new Error("needs param");
@@ -8,7 +16,7 @@ export const createHTML = (domstring) => {
   return html.body.firstChild;
 };
 
-let container = createHTML("<div style='position:absolute;'>");
+let container = createHTML("<div style='position:relative;'>");
 
 document.addEventListener("DOMContentLoaded", function (event) {
   document.body.appendChild(container);
@@ -42,7 +50,7 @@ export function logHotkeyList() {
 
 export function createRect(name, top, left) {
   return $(
-    `<div id="${name}" style='position:relative;top:${top};left:${left};border:2px solid darkslategray;margin:1em;padding:1em;background-color:mediumslateblue'>${name}</div>`
+    `<div id="${name}" style='position:relative;top:${top};left:${left};border:2px solid darkslategray;padding:1em;background-color:mediumslateblue'>${name}</div>`
   );
 }
 
@@ -51,7 +59,7 @@ function createCard({
   subTitle = "an exemplary implementation of a editor GUI",
   text = "",
 }) {
-  return $(`<div class="card" style="min-width: 18rem;">
+  return $(`<div class="card" >
  <div class="card-body">
  <h5 class="card-title">${title}</h5>
    <h6 class="card-subtitle mb-2 text-muted">${subTitle}</h6>
@@ -63,6 +71,11 @@ function createCard({
 
 export function createHelp() {
   let entries = getRegistered();
+
+  //log("trying to rebind to ctrl+c ...");
+  //TODO we are currently unbinding all mousetrap events for( elements) which interferes with our overall goal to be able to have multiple combos per action
+  //rebind("hello-action", 0, "ctrl+c");
+
 
   const rows = _.map(entries, (val) =>
     $(`<tr>
@@ -104,4 +117,17 @@ export function randomRGB() {
   var colorG = Math.floor(Math.random() * 256);
   var colorB = Math.floor(Math.random() * 256);
   return "rgb(" + colorR + "," + colorG + "," + colorB + ")";
+}
+
+export function createExampleTargets() {
+  var target1 = createRect("target1", 100, 300).css({ margin: "18rem" });
+  $("body").prepend(target1);
+
+  var targetWithinTarget = createRect("targetWithinTarget", 50, 50);
+  target1.append(targetWithinTarget);
+
+  var targetWithinTargetT = createRect("targetWithinTargetT", 50, 50);
+  targetWithinTarget.append(targetWithinTargetT);
+
+  return [target1, targetWithinTarget, targetWithinTargetT];
 }
