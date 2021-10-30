@@ -1,13 +1,5 @@
 import $ from "cash-dom";
 
-$("<link/>")
-  .attr({
-    rel: "stylesheet",
-    type: "text/css",
-    href: "https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css",
-  })
-  .appendTo("head");
-
 let container = $(
   "<div style='position:relative; border-top:2px solid black'>"
 );
