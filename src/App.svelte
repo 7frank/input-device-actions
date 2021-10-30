@@ -1,12 +1,14 @@
 <script lang="ts">
   import KeyBindingsEditor from "./gui/components/KeyBindingsEditor.svelte";
+  import ModalDialog from "./gui/components/KeybindingsEditorDialog.svelte";
 
   export let name: string;
 </script>
 
 <main>
   <h1>KeyBindings - Editor {name}</h1>
-  <KeyBindingsEditor />
+  <h3>an exemplary implementation of a editor GUI</h3>
+  <ModalDialog><KeyBindingsEditor /></ModalDialog>
 </main>
 
 <style>

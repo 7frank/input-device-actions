@@ -76,4 +76,3 @@ export function onInputPress(event, id, action) {
 
   return false;
 }
-

@@ -1,15 +1,7 @@
 import { Hotkeys } from "../core";
-import {
-  createRect,
-  createExampleTargets,
-  log,
-  createHelp,
-  randomRGB,
-} from "./example-utils";
+import { createExampleTargets, log, randomRGB } from "./example-utils";
 import * as _ from "lodash";
 import $ from "cash-dom";
-
-$(loadExamples);
 
 /**
  *
@@ -27,7 +19,7 @@ function onHelloAction(e) {
  *
  * create the example stuff
  */
-function loadExamples(event) {
+export function loadExamples(event) {
   window.HK = Hotkeys;
 
   /**
@@ -53,22 +45,6 @@ function loadExamples(event) {
    */
   Hotkeys.register("help-action", ["h", "f1"], {
     description: "toggles a the keybinding editor dialog",
-  });
-
-  var help;
-  function toggleHelp() {
-    if (help) {
-      help.remove();
-      help = undefined;
-    } else {
-      help = createHelp();
-      $("body").prepend(help);
-    }
-  }
-
-  Hotkeys(window).on("help-action", function (e) {
-    e.stopPropagation();
-    toggleHelp();
   });
 
   /**

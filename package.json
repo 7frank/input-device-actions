@@ -10,7 +10,7 @@
     "start": "sirv public --no-clear",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "format": "prettier --write .",
-    "publish":"surge public input-device-actions.7frank.surge.sh"
+    "publish": "surge public input-device-actions.7frank.surge.sh"
   },
   "license": "MIT",
   "keywords": [
@@ -36,7 +36,6 @@
     "typescript": "^4.0.0"
   },
   "dependencies": {
-    "cash-dom": "^8.1.0",
     "humaninput": "^1.1.15",
     "key-event-to-string": "^1.2.0",
     "keypress.js": "^2.1.5",

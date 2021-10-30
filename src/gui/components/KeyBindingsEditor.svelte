@@ -13,9 +13,12 @@
 
   import _ from "lodash";
 
-  let entries = [];
+  let entries;
 
-  Hotkeys.onChange(() => (entries = Object.values(getRegistered())));
+  const reloadEntries = () => (entries = Object.values(getRegistered()));
+
+  reloadEntries();
+  Hotkeys.onChange(reloadEntries);
 
   var isArrayEqual = function (x, y) {
     return _(x).differenceWith(y, _.isEqual).isEmpty();

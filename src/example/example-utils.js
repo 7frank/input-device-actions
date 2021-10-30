@@ -18,34 +18,6 @@ export function createRect(name, top, left) {
   );
 }
 
-function createCard({
-  title = "Keyboard Binding Editor",
-  subTitle = "an exemplary implementation of a editor GUI",
-  text = "",
-}) {
-  return $(`<div class="card" >
- <div class="card-body">
- <h5 class="card-title">${title}</h5>
-   <h6 class="card-subtitle mb-2 text-muted">${subTitle}</h6>
-   <p class="card-text">${text}</p>
-   <a href="#" class="card-link">Card link</a>
- </div>
-</div>`);
-}
-
-export function createHelp() {
-  //log("trying to rebind to ctrl+c ...");
-  //TODO we are currently unbinding all mousetrap events for( elements) which interferes with our overall goal to be able to have multiple combos per action
-  //rebind("set-random-color-action", 0, "ctrl+c");
-
-  const table = $("<table></table>") // createKeybindingEditor();
-
-  const card = createCard({});
-  card.find(".card-text").append(table);
-
-  return card;
-}
-
 export function randomRGB() {
   var colorR = Math.floor(Math.random() * 256);
   var colorG = Math.floor(Math.random() * 256);
