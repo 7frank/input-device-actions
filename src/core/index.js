@@ -25,7 +25,7 @@
 
 //import "./interactions"
 
-import { onElementChange } from "../listeners";
+import { onElementChange } from "./listeners";
 import * as _ from "lodash";
 import { assignIn as extend, forEach } from "lodash";
 //import $ from 'jquery';
