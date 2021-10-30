@@ -74,11 +74,9 @@ function loadExamples(event) {
   /**
    * register an action that shows the keybinding editor
    */
-  Hotkeys.register(
-    "hello-action",
-    "ctrl+space",
-    {description:"set random color for element"}
-  );
+  Hotkeys.register("hello-action", "ctrl+space", {
+    description: "set random color for element",
+  });
 
   const [target1, targetWithinTarget, targetWithinTargetT] =
     createExampleTargets();

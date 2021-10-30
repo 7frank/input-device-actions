@@ -1,6 +1,7 @@
 import $ from "cash-dom";
 
-import { getRegistered, rebind } from "../src/index";
+import { rebind } from "../src/index";
+import { createKeybindingEditor } from "./createKeybindingEditor";
 
 $("<link/>")
   .attr({
@@ -44,40 +45,11 @@ function createCard({
 }
 
 export function createHelp() {
-  let entries = getRegistered();
-
   //log("trying to rebind to ctrl+c ...");
   //TODO we are currently unbinding all mousetrap events for( elements) which interferes with our overall goal to be able to have multiple combos per action
   //rebind("hello-action", 0, "ctrl+c");
 
-  const rows = _.map(entries, (val) =>
-    $(`<tr>
-        <td>${val.action}</td>
-        <td>${val.combo}</td>
-        <td>${val.description}</td>
-        <td><input></input></td>
-        <td><button>save</button></td>
-    </tr>`)
-  );
-
-  const table = $(`
-<table class="table">
-  <thead>
-    <tr>
-      <th scope="col">action</th>
-      <th scope="col">combo</th>
-      <th scope="col">description</th>
-      <th scope="col">input new combo</th>
-      <th scope="col">save new combo</th>
-    </tr>
-  </thead>
-  <tbody>
-  
-  </tbody>
-</table>
-`);
-
-  table.find("tbody").append(...rows);
+  const table = createKeybindingEditor();
 
   const card = createCard({});
   card.find(".card-text").append(table);
@@ -93,19 +65,30 @@ export function randomRGB() {
 }
 
 export function createExampleTargets() {
+  var header = $("<h3>Press 'h' for help</h3>");
 
-  var header = $("<h3>Press 'h' for help</h3>")
-
-  var target1 = createRect("use the key combo for 'hello-action' to toggle my color when hovering ", 100, 300).css({
+  var target1 = createRect(
+    "use the key combo for 'hello-action' to toggle my color when hovering ",
+    100,
+    300
+  ).css({
     margin: "2rem",
     marginLeft: "18rem",
   });
-  $("body").prepend(header,target1);
+  $("body").prepend(header, target1);
 
-  var targetWithinTarget = createRect("or here (you can change the key combo in the editor when pressing 'h')", 50, 50);
+  var targetWithinTarget = createRect(
+    "or here (you can change the key combo in the editor when pressing 'h')",
+    50,
+    50
+  );
   target1.append(targetWithinTarget);
 
-  var targetWithinTargetT = createRect("I will toggle twice - when pressing & when releasing the combo keys", 50, 50);
+  var targetWithinTargetT = createRect(
+    "I will toggle twice - when pressing & when releasing the combo keys",
+    50,
+    50
+  );
   targetWithinTarget.append(targetWithinTargetT);
 
   return [target1, targetWithinTarget, targetWithinTargetT];
