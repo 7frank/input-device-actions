@@ -1,8 +1,26 @@
 import { getRegistered, Hotkeys, rebind } from "../src/index";
-import { createHTML, createRect, log, logHotkeyList } from "./example-utils";
+import {
+  createRect,
+  log,
+  logHotkeyList,
+  createHelp,
+  randomRGB,
+} from "./example-utils";
 import * as _ from "lodash";
 
-document.addEventListener("DOMContentLoaded", function (event) {
+import $ from "cash-dom";
+
+$("<link/>")
+  .attr({
+    rel: "stylesheet",
+    type: "text/css",
+    href: "https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css",
+  })
+  .appendTo("head");
+
+$(loadExamples);
+
+function loadExamples(event) {
   window.HK = Hotkeys;
 
   logHotkeyList();
@@ -24,80 +42,50 @@ document.addEventListener("DOMContentLoaded", function (event) {
   //Hotkeys("hello-action", "ctrl+space", hello)
   Hotkeys.setDebug(true);
 
+  Hotkeys.register("help-action", "h", {
+    description: "toggles a the keybinding editor dialog",
+  });
+
+  var help;
+  Hotkeys(window).on("help-action", function (e) {
+    e.stopPropagation();
+
+    if (help) {
+      help.remove();
+      help = undefined;
+    } else {
+      help = createHelp();
+      $("body").prepend(help);
+    }
+  });
+
   Hotkeys.register("hello-action", "ctrl+space");
 
-  Hotkeys(window).on("hello-action", function (e) {
-    e.stopPropagation();
-
-    console.log(">>>", arguments);
-    log("hello window");
-  });
-
   var target1 = createRect("target1", 100, 300);
-  document.body.appendChild(target1);
-
-  Hotkeys(target1).on("hello-action", function (e) {
-    e.stopPropagation();
-    console.log(">>>", arguments);
-    log("hello target1");
-  });
+  $("body").append(target1);
 
   var targetWithinTarget = createRect("targetWithinTarget", 50, 50);
-  target1.appendChild(targetWithinTarget);
-
-  Hotkeys(targetWithinTarget).on("hello-action", function (e) {
-    e.stopPropagation();
-    console.log(">>>", arguments);
-    log("hello targetWithinTarget");
-  });
+  target1.append(targetWithinTarget);
 
   var targetWithinTargetT = createRect("targetWithinTargetT", 50, 50);
-  targetWithinTarget.appendChild(targetWithinTargetT);
+  targetWithinTarget.append(targetWithinTargetT);
 
-  Hotkeys(targetWithinTargetT).on(
-    "hello-action",
-    function (e) {
-      e.stopPropagation();
-      console.log(">>>down", arguments);
-      log("hello targetWithinTargetT");
-    },
-    function (e) {
-      e.stopPropagation();
-      console.log(">>>up", arguments);
-      log("hello targetWithinTargetT");
-    }
-  );
+  function onHelloAction(e) {
+    e.stopPropagation();
+
+    log("triggered hello-action targetWithinTargetT");
+
+    $(e.target).css("background-color", randomRGB());
+  }
+
+  Hotkeys(target1).on("hello-action", onHelloAction);
+  Hotkeys(targetWithinTarget).on("hello-action", onHelloAction);
+  Hotkeys(targetWithinTargetT).on("hello-action", onHelloAction, onHelloAction);
 
   //-------------------------
 
-  log("trying to rebind to ctrl+enter ...");
-  rebind("hello-action", 0, "ctrl+enter");
+  log("trying to rebind to ctrl+c ...");
+  rebind("hello-action", 0, "ctrl+c");
 
   //TODO we are currently unbinding all mousetrap events for( elements) which interferes with our overall goal to be able to have multiple combos per action
-});
-
-/*
-
-//stub functions below...
-
-//grab and hold an icon
- function grabItem(){}
-
-//take an item and put it into inventory
- function takeItem(){}
-
-//
- function enterCar(){}
- function exitCar(){}
-
- function HUDMenuListViewUp(){}
- function HUDMenuListViewDown(){}
-
-
-Hotkeys.register("user-interact",,{default:["e"],description:"an event that is triggered whenever a user is looking at and wants to start a default interaction with an object.")
-Hotkeys.register("user-move-left","a")
-Hotkeys.register("user-move-right","d")
-
-
-
- */
+}

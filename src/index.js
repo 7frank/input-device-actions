@@ -66,8 +66,19 @@ var _events = new Emitter();
  * @param extra - if extra is a function, it will be interpreted as keyup event  and the handler will be keydown event else handler is keypress
  */
 
-export function Hotkeys(target = window) {
+export function Hotkeys(el = window) {
   var that = this;
+
+  let target;
+  if (el == window || el instanceof HTMLElement) {
+    target = window;
+  } else if (typeof el.get == "function") {
+    target = el.get(0);
+  } else if (typeof el == "string") {
+    target = document.querySelector(el);
+  } else {
+    throw new Error("invalid Hotkeys target");
+  }
 
   //FIXME put this somewhere else as an option or something
   fixFocusAndOtherThingsForNow(target);
