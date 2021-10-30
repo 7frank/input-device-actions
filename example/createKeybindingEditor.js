@@ -1,5 +1,5 @@
 import $ from "cash-dom";
-import { getRegistered } from "../src/index";
+import { getRegistered, isBound, rebind } from "../src/index";
 import * as event2stringProto from "key-event-to-string";
 
 export function getElementFromEvent(e) {
@@ -23,7 +23,7 @@ function createInputItem(t, keyID, action) {
 
   const input = $(`<input 
      value=${t.combo} 
-     disabled=${t.locked ? true : false}
+     ${t.locked && "disabled"}
      title=${t.error ? t.error : ""}>
   </input>`).on("keydown", (evt) =>
     onInputPress.bind(this)(evt, keyID, action)
@@ -46,6 +46,8 @@ function onInputPress(event, id, action) {
   event.stopPropagation();
 
   let details = event2stringProto.details(event);
+
+  console.log("onInputPress", details);
 
   var c = null;
 
@@ -104,7 +106,7 @@ export function createKeybindingEditor() {
         <td id="edit"></td>
         <td>${val.description}</td>
     </tr>`);
-
+    console.log(val);
     var items = val.combo.map((tag, key) =>
       createInputItem(tag, key, val.action)
     );
