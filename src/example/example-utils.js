@@ -1,5 +1,4 @@
 import $ from "cash-dom";
-import { createKeybindingEditor } from "../gui/createKeybindingEditor";
 
 $("<link/>")
   .attr({
@@ -47,7 +46,7 @@ export function createHelp() {
   //TODO we are currently unbinding all mousetrap events for( elements) which interferes with our overall goal to be able to have multiple combos per action
   //rebind("set-random-color-action", 0, "ctrl+c");
 
-  const table = createKeybindingEditor();
+  const table = $("<table></table>") // createKeybindingEditor();
 
   const card = createCard({});
   card.find(".card-text").append(table);

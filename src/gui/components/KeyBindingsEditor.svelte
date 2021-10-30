@@ -9,6 +9,8 @@
     Hotkeys,
   } from "../../core";
 
+  import KeyBindingsInputItem from "./KeyBindingsInputItem.svelte";
+
   import _ from "lodash";
 
   let entries = [];
@@ -40,7 +42,11 @@
       {#each entries as t, i}
         <tr>
           <td><span title="${t.action}">{t.title}</span></td>
-          <td id="edit">
+          <td>
+            {#each t.combo as comboConfig, key}
+              <KeyBindingsInputItem {comboConfig} keyID={key} />
+            {/each}
+
             <Button on:click={() => addComboForAction(t.action)}>add</Button>
 
             {#if !isArrayEqual(t.combo, t.defaults)}
@@ -64,25 +70,3 @@
     </Col>
   </Row>
 </div>
-
-<!-- 
-  let entries = getRegistered();
-  const rows = _.map(entries, (t) => {
-    const res = $(`<tr>
-        <td><span title=${t.action}>${t.title}</span></td>
-        <td id="edit"></td>
-         
-        <td>${t.description}</td>
-    </tr>`);
-
-    var items = t.combo.map((tag, key) => createInputItem(tag, key, t.action));
-
-
-
-    res.find("#edit").append(...items, $addComboButton, $undoButton);
-    return res;
-  });
-
-  const table = $(`
-
-`); -->
