@@ -25,7 +25,7 @@
 
 //import "./interactions"
 
-import { onElementChange } from "../listeners";
+import { onElementChange } from "./listeners";
 import * as _ from "lodash";
 import { assignIn as extend, forEach } from "lodash";
 //import $ from 'jquery';
@@ -95,8 +95,17 @@ export function Hotkeys(el = window) {
       //global options
       let defaults = _keys[action];
 
-      //FIXME wait for Hotkeys.register if no defaults exist
+      // register dummy and mark with "not-registered"
+      if (!defaults) {
+        Hotkeys.register(action, "", {
+          description:
+            "this was not previously registered TODO mark with not-registered",
+          "not-registered": true,
+        });
+        defaults = _keys[action];
+      }
 
+      // create options
       var options = extend({}, defaults);
       options.handler = handler;
       options.extra = extra;
@@ -226,7 +235,15 @@ Hotkeys.register = function (action, combo, options) {
   if (!options.title) options.title = options.action;
 
   if (_keys[action]) {
-    console.warn("action '" + action + "' already set");
+    //TODO check if we do have to copy instead of replace, in case there are dom-elements within the configuration listening
+    // in case of race conditions we override the temporary registration TODO check if we do have to copy instead of replace, in case there are dom-elements within the configuration listening
+    if (_keys[action]["not-registered"]) {
+      _keys[action] = options;
+      console.warn("action '" + action + "' previously 'not-registered'");
+    } else {
+      console.warn("action '" + action + "' already set");
+    }
+
     return;
   }
 
