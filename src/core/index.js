@@ -97,10 +97,14 @@ export function Hotkeys(el = window) {
 
       //TODO register dummy and mark with not-registered, when it is registered later it will be possible to override
 
-      if (!defaults) 
-     { Hotkeys.register(action, "", {description:"this was not previously registered TODO mark with not-registered"}) 
-     defaults = _keys[action];
-        }
+      if (!defaults) {
+        Hotkeys.register(action, "", {
+          description:
+            "this was not previously registered TODO mark with not-registered",
+          "not-registered": true,
+        });
+        defaults = _keys[action];
+      }
       var options = extend({}, defaults);
       options.handler = handler;
       options.extra = extra;
@@ -230,7 +234,17 @@ Hotkeys.register = function (action, combo, options) {
   if (!options.title) options.title = options.action;
 
   if (_keys[action]) {
-    console.warn("action '" + action + "' already set");
+    //TODO check if we do have to copy instead of replace, in case there are dom-elements within the configuration listening
+    // in case of race conditions we override the temporary registration TODO check if we do have to copy instead of replace, in case there are dom-elements within the configuration listening
+    if (_keys[action]["not-registered"]) {
+      _keys[action] = options;
+      console.warn(
+        "action '" + action + "' previously 'not-registered'"
+      );
+    } else {
+      console.warn("action '" + action + "' already set");
+    }
+
     return;
   }
 

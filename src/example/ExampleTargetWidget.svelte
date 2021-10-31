@@ -27,8 +27,8 @@
   const top = getRandomInt(10, 30) + "%";
   const left = getRandomInt(10, 30) + "%";
 
-  const height = getRandomInt(20, 50) + "%";
-  const width = getRandomInt(20, 50) + "%";
+  const bottom = getRandomInt(20, 50) + "%";
+  const right = getRandomInt(20, 50) + "%";
 
   let bgColor = randomRGB();
 
@@ -37,8 +37,8 @@
   $: styles = {
     top,
     left,
-    height,
-    width,
+    bottom,
+    right,
     "background-color": bgColor,
   };
 
@@ -61,6 +61,10 @@
   onMount(() => {
     Hotkeys("#" + uuid).on("set-random-color-action", onHelloAction);
     Hotkeys("#" + uuid).on("move-left-action", onHelloAction);
+
+    Hotkeys.register("move-left-action", "a", {
+      description: "move the target to the left",
+    });
 
     // TODO showcase up / down
     // Hotkeys(targetWithinTargetT).on(
