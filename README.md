@@ -51,11 +51,9 @@ For the reference implementation dowload npm "@nk/core-components" and check out
 - though the library is primarily targeted to solve they keymap via actions, we should expose the same functionality without the actions
   - (this is useful where no configuration will be necessary ike with the gyro maybe)
 
+## TODO
 
-## TODO 
-
-- currently rebinding keys will not work via gui 
-
+- currently rebinding keys will not work via gui
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

@@ -1,6 +1,6 @@
 <script lang="ts">
   export let comboConfig: {};
-  export let keyId: string;
+  export let keyId: number;
   export let action: string;
   import { onInputPress } from "../utils";
 

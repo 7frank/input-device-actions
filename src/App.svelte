@@ -3,15 +3,22 @@
   import ModalDialog from "./gui/components/KeybindingsEditorDialog.svelte";
   import Log from "./example/Log.svelte";
   import Examples from "./example/Examples.svelte";
-
+  import ActionButton from "./ActionButton.svelte";
   export let name: string;
 </script>
 
 <main>
   <h1>KeyBindings - Editor {name}</h1>
   <h3>an exemplary implementation of a editor GUI</h3>
-  <h3>Press 'h' for help</h3>
-
+  <h3>Press 'h' for list of available commands</h3>
+  <h4>
+    <ActionButton action="(-1)move-left-action" /> to move the left side of the rectangle
+    to the left
+  </h4>
+  <h4>
+    <ActionButton action="(1)move-left-action" /> to move the left side of the rectangle
+    to the right
+  </h4>
   <div class="area">
     <Examples />
   </div>

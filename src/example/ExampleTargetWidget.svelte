@@ -102,7 +102,7 @@
 
     Hotkeys("#" + uuid).on("set-random-color-action", onHelloAction);
 
-    // TODO showcase keyup / keydown 
+    // TODO showcase keyup / keydown
     // Hotkeys(targetWithinTargetT).on(
     //   "set-random-color-action",
     //   onHelloAction,
