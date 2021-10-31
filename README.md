@@ -7,7 +7,7 @@
 
 This library contains a simple wrapper for _different_ input methods. By introducing an 'action' to bind multiple input combos plus their handlers with it a better customisation by the user may be achieved.
 
-See for yourself with a running [Demo](input-device-actions.7frank.surge.sh)
+See for yourself with a running [Demo](http://input-device-actions.7frank.surge.sh)
 
 For example:
 
