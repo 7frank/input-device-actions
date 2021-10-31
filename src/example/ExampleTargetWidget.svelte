@@ -34,7 +34,7 @@
 
   let uuid = "id-" + uuidv4();
 
-  let styles = {
+  $: styles = {
     top,
     left,
     height,
@@ -71,6 +71,7 @@
 </script>
 
 <main id={uuid} style={cssVarStyles}>
+  {bgColor}
   <slot />
 </main>
 

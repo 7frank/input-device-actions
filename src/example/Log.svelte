@@ -1,5 +1,5 @@
 <script lang="ts" context="module">
-  const messages = [];
+  let messages = [];
 
   export function log(...args: any[]) {
     messages.push(args.join(" "));
