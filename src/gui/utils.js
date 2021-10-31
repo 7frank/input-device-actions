@@ -13,7 +13,7 @@ export function getElementFromEvent(e) {
 }
 
 /**
- * TODO split and refactor .. the event to string part should probably be put into the interactionss library as it is closer logically
+ * TODO split and refactor .. the event to string part should probably be put into the interactions library as it is closer logically
  * @param {*} event
  * @param {number} id
  * @param {string} action
@@ -25,7 +25,7 @@ export function onInputPress(event, id, action) {
 
   let details = event2stringProto.details(event);
 
-  console.log("onInputPress", details);
+  console.log("onInputPress", details, "action", action);
 
   var c = null;
 

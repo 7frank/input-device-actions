@@ -1,9 +1,11 @@
 <script lang="ts">
-  export let comboConfig: string;
+  export let comboConfig: {};
   export let keyId: string;
+  export let action: string;
   import { onInputPress } from "../utils";
 
-  const action = comboConfig.action;
+  console.log("comboConfig", comboConfig);
+
   var iconTypes = { keyboard: "keyboard-o" };
   var icon = iconTypes[comboConfig.type];
   if (!icon) icon = "question";
@@ -15,9 +17,14 @@
       value={comboConfig.combo}
       disabled={!!comboConfig.locked}
       title={comboConfig.error ? comboConfig.error : ""}
-      on:keydown={(evt) => onInputPress.bind(this)(evt, keyId, action)}
+      on:keydown={(evt) => onInputPress(evt, keyId, action)}
     />
-    {!comboConfig.error ? "icon-ok" : "icon-exclamation-triangle"}
+
+    {#if !comboConfig.error}
+      <i class="fa-solid fa-circle-check" />
+    {:else}
+      <i class="fa-solid fa-triangle-exclamation" />
+    {/if}
   </div>
 </main>
 

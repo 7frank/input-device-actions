@@ -24,11 +24,11 @@
     return Math.floor(Math.random() * (max - min)) + min;
   }
 
-  const top = getRandomInt(10, 30) + "%";
-  const left = getRandomInt(10, 30) + "%";
+  let top = getRandomInt(10, 30) + "%";
+  let left = getRandomInt(10, 30) + "%";
 
-  const bottom = getRandomInt(20, 50) + "%";
-  const right = getRandomInt(20, 50) + "%";
+  let bottom = getRandomInt(20, 50) + "%";
+  let right = getRandomInt(20, 50) + "%";
 
   let bgColor = randomRGB();
 
@@ -58,15 +58,51 @@
     bgColor = randomRGB();
   }
 
-  onMount(() => {
-    Hotkeys("#" + uuid).on("set-random-color-action", onHelloAction);
-    Hotkeys("#" + uuid).on("move-left-action", onHelloAction);
+  function move(direction, amount) {
+    return function (e) {
+      e.stopPropagation();
 
-    Hotkeys.register("move-left-action", "a", {
-      description: "move the target to the left",
+      switch (direction) {
+        case "left":
+          left = parseInt(left) + amount + "%";
+          break;
+        case "right":
+          right = parseInt(right) + amount + "%";
+          break;
+        case "bottom":
+          bottom = parseInt(bottom) + amount + "%";
+          break;
+        case "top":
+          top = parseInt(top) + amount + "%";
+          break;
+      }
+    };
+  }
+
+  onMount(() => {
+    const data = [
+      { hk: "a", text: "left", amount: -1 },
+      { hk: "d", text: "right", amount: -1 },
+      { hk: "w", text: "top", amount: -1 },
+      { hk: "s", text: "bottom", amount: -1 },
+
+      // { hk: "ArrowLeft", text: "left", amount: 1 },
+      // { hk: "ArrowRight", text: "right", amount: 1 },
+      // { hk: "ArrowUp", text: "top", amount: 1 },
+      // { hk: "ArrowDown", text: "bottom", amount: 1 },
+    ];
+
+    data.forEach(({ hk, text, amount }) => {
+      const name = `(${amount})move-${text}-action`;
+      Hotkeys.register(name, hk, {
+        description: `move the target to the ${text} by amount ${amount}`,
+      });
+      Hotkeys("#" + uuid).on(name, move(text, amount));
     });
 
-    // TODO showcase up / down
+    Hotkeys("#" + uuid).on("set-random-color-action", onHelloAction);
+
+    // TODO showcase keyup / keydown 
     // Hotkeys(targetWithinTargetT).on(
     //   "set-random-color-action",
     //   onHelloAction,

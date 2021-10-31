@@ -51,6 +51,12 @@ For the reference implementation dowload npm "@nk/core-components" and check out
 - though the library is primarily targeted to solve they keymap via actions, we should expose the same functionality without the actions
   - (this is useful where no configuration will be necessary ike with the gyro maybe)
 
+
+## TODO 
+
+- currently rebinding keys will not work via gui 
+
+
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 _Psst — looking for a more complete solution? Check out [SvelteKit](https://kit.svelte.dev), the official framework for building web applications of all sizes, with a beautiful development experience and flexible filesystem-based routing._
