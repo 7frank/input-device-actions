@@ -60,7 +60,7 @@
 
   onMount(() => {
     Hotkeys("#" + uuid).on("set-random-color-action", onHelloAction);
-    // .on("move-left-action", onHelloAction);
+    Hotkeys("#" + uuid).on("move-left-action", onHelloAction);
 
     // TODO showcase up / down
     // Hotkeys(targetWithinTargetT).on(

@@ -95,8 +95,12 @@ export function Hotkeys(el = window) {
       //global options
       let defaults = _keys[action];
 
-      //FIXME wait for Hotkeys.register if no defaults exist
+      //TODO register dummy and mark with not-registered, when it is registered later it will be possible to override
 
+      if (!defaults) 
+     { Hotkeys.register(action, "", {description:"this was not previously registered TODO mark with not-registered"}) 
+     defaults = _keys[action];
+        }
       var options = extend({}, defaults);
       options.handler = handler;
       options.extra = extra;

@@ -2,7 +2,7 @@
   let messages = [];
 
   export function log(...args: any[]) {
-    messages.push(args.join(" "));
+    messages.unshift(args.join(" "));
   }
 </script>
 
