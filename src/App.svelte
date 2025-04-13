@@ -23,7 +23,7 @@
     <Examples />
   </div>
 
-  <ModalDialog><KeyBindingsEditor /></ModalDialog>
+  <ModalDialog  open={true}><KeyBindingsEditor /></ModalDialog>
   <Log />
 </main>
 
