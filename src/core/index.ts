@@ -26,11 +26,25 @@ const _keys: Record<string, ActionOptions> = {};
 const _already_set_combos: Record<string, string> = {};
 const _events = new Emitter();
 
+/**
+ * Creates a scoped hotkey instance bound to a specific target.
+ *
+ * @param el - The target to scope key bindings to. Accepted values:
+ *   - `window` (default) — binds globally to the window
+ *   - `HTMLElement` — binds to that specific DOM element; the element
+ *     automatically receives `tabIndex="-1"` and focus-on-hover so it
+ *     can receive keyboard events when the mouse is over it
+ *   - CSS selector string e.g. `"#my-panel"` — resolved via
+ *     `document.querySelector` at call time
+ *   - jQuery-like object with a `.get(n)` method
+ */
 export function Hotkeys(el: EventTarget | string = window): HotkeysInstance {
   let target: EventTarget;
 
-  if (el === window || el instanceof HTMLElement) {
+  if (el === window) {
     target = window;
+  } else if (el instanceof HTMLElement) {
+    target = el;
   } else if (typeof (el as unknown as JQueryLike).get === "function") {
     target = (el as unknown as JQueryLike).get(0);
   } else if (typeof el === "string") {
