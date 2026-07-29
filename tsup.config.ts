@@ -15,10 +15,10 @@ const redirectCoreToDistPlugin: Plugin = {
 
 export default defineConfig([
   {
-    entry: { index: "src/core/index.js" },
+    entry: { index: "src/core/index.ts" },
     outDir: "dist/core",
     format: ["esm", "cjs"],
-    dts: false,
+    dts: true,
     clean: true,
     esbuildPlugins: [
       esbuildSvelte({ preprocess: sveltePreprocess() }),

@@ -14,10 +14,15 @@
     "format": "prettier --write ."
   },
   "exports": {
-    ".": "./dist/core/index.mjs",
+    ".": {
+      "types": "./dist/core/index.d.ts",
+      "import": "./dist/core/index.mjs",
+      "require": "./dist/core/index.js"
+    },
     "./ui": "./dist/ui/index.mjs",
     "./ui/index.css": "./dist/ui/index.css"
   },
+  "types": "./dist/core/index.d.ts",
   "main": "./dist/core/index.js",
   "module": "./dist/core/index.mjs",
   "license": "MIT",
