@@ -1,6 +1,9 @@
 <script lang="ts">
   import { Hotkeys } from "../../core";
   import KeyBindingsEditor from "./KeyBindingsEditor.svelte";
+  import type { Snippet } from "svelte";
+
+  let { children }: { children?: Snippet } = $props();
 
   let open = $state(false);
   const toggle = () => (open = !open);
@@ -20,7 +23,11 @@
         <button class="close-btn" onclick={toggle}>✕</button>
       </div>
       <div class="modal-body">
-        <KeyBindingsEditor />
+        {#if children}
+          {@render children()}
+        {:else}
+          <KeyBindingsEditor />
+        {/if}
       </div>
     </div>
   </div>
