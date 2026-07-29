@@ -1,6 +1,13 @@
 {
   "extends": "@tsconfig/svelte/tsconfig.json",
-
-  "include": ["src/**/*"],
-  "exclude": ["node_modules/*", "__sapper__/*", "public/*"]
+  "compilerOptions": {
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": false,
+    "sourceMap": true
+  },
+  "include": ["src/**/*", "vite.config.js"],
+  "exclude": ["node_modules/*", "public/*"]
 }

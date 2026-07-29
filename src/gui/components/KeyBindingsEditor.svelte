@@ -1,5 +1,4 @@
 <script>
-  import { Button, Col, Row, Table } from "sveltestrap";
   import {
     getRegistered,
     isBound,
@@ -11,8 +10,6 @@
 
   import KeyBindingsInputItem from "./KeyBindingsInputItem.svelte";
 
-  import _ from "lodash";
-
   let entries;
 
   const reloadEntries = () => (entries = Object.values(getRegistered()));
@@ -20,67 +17,90 @@
   reloadEntries();
   Hotkeys.onChange(reloadEntries);
 
-  var isArrayEqual = function (x, y) {
-    return _(x).differenceWith(y, _.isEqual).isEmpty();
-  };
+  const isArrayEqual = (x, y) =>
+    x.length === y.length && x.every((a, i) => JSON.stringify(a) === JSON.stringify(y[i]));
 </script>
 
-<svelte:head>
-  <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css"
-  />
-
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css"
-    integrity="sha512-YWzhKL2whUzgiheMoBFwW8CKV4qpHQAEuvilg9FAn5VJUDwKZZxkJNuGM4XkWuk94WCrrwslk8yWNGmY1EduTA=="
-    crossorigin="anonymous"
-    referrerpolicy="no-referrer"
-  />
-</svelte:head>
-
-<div>
-  <Table>
+<div class="editor">
+  <table>
     <thead>
       <tr>
-        <th scope="col">action</th>
-        <th scope="col">combo</th>
-        <th scope="col">description</th>
+        <th>action</th>
+        <th>combo</th>
+        <th>description</th>
       </tr>
     </thead>
     <tbody>
       {#each entries as t, i}
         <tr>
-          <td><span title="${t.action}">{t.title}</span></td>
-          <td>
+          <td><span title={t.action}>{t.title}</span></td>
+          <td class="combo-cell">
             {#each t.combo as comboConfig, key}
               <KeyBindingsInputItem
                 {comboConfig}
-                keyID={key}
+                keyId={key}
                 action={t.action}
               />
             {/each}
 
-            <i
-              class="fa-solid fa-plus"
-              on:click={() => addComboForAction(t.action)}
-            />
+            <button class="icon-btn" on:click={() => addComboForAction(t.action)} title="add combo">+</button>
 
             {#if !isArrayEqual(t.combo, t.defaults)}
-              <i
-                class="fa-solid fa-trash-undo"
+              <button
+                class="icon-btn"
                 on:click={() => resetActionCombosToDefault(t.action)}
-                title={"reset to defaults:" +
-                  t.defaults.map((el) => el.combo).join(" ")}
-              />
-            {:else}
-              <Button disabled>undo</Button>
+                title={"reset to defaults: " + t.defaults.map((el) => el.combo).join(" ")}
+              >↩</button>
             {/if}
           </td>
           <td>{t.description}</td>
         </tr>
       {/each}
     </tbody>
-  </Table>
+  </table>
 </div>
+
+<style>
+  .editor {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+
+  th, td {
+    text-align: left;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid #ddd;
+  }
+
+  th {
+    font-weight: 600;
+    background: #f5f5f5;
+  }
+
+  .combo-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+
+  .icon-btn {
+    background: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 0.1rem 0.4rem;
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+
+  .icon-btn:hover {
+    background: #eee;
+  }
+</style>
