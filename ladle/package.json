@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "@nk11/keyboard-interactions": "file:..",
-    "svelte": "^4.0.0"
+    "svelte": "^5.0.0"
   },
   "devDependencies": {
     "@ladle/react": "latest",

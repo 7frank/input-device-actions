@@ -1,16 +1,20 @@
 <script lang="ts">
-  export let comboConfig: { type: string; combo: string; locked?: boolean; error?: string };
-  export let keyId: number;
-  export let action: string;
   import { onInputPress } from "../utils";
+  import type { ComboParam } from "../../core";
+
+  let { comboConfig, keyId, action }: {
+    comboConfig: ComboParam;
+    keyId: number;
+    action: string;
+  } = $props();
 </script>
 
 <div class="item">
   <input
     value={comboConfig.combo}
     disabled={!!comboConfig.locked}
-    title={comboConfig.error ? comboConfig.error : ""}
-    on:keydown={(evt) => onInputPress(evt, keyId, action)}
+    title={comboConfig.error ?? ""}
+    onkeydown={(evt) => onInputPress(evt, keyId, action)}
   />
   {#if comboConfig.error}
     <span class="status error" title={comboConfig.error}>⚠</span>

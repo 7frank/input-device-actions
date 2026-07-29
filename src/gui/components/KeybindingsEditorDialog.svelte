@@ -1,25 +1,26 @@
 <script lang="ts">
   import { Hotkeys } from "../../core";
+  import KeyBindingsEditor from "./KeyBindingsEditor.svelte";
 
-  export let open = false;
+  let open = $state(false);
   const toggle = () => (open = !open);
 
-  Hotkeys(window).on("help-action", function (e) {
+  Hotkeys(window).on("help-action", function (e: Event) {
     e.stopPropagation();
     toggle();
   });
 </script>
 
 {#if open}
-  <div class="modal-backdrop" on:click={toggle} />
+  <div class="modal-backdrop" onclick={toggle}></div>
   <div class="modal-dialog" role="dialog">
     <div class="modal-content">
       <div class="modal-header">
         <h2>Change your key bindings</h2>
-        <button class="close-btn" on:click={toggle}>✕</button>
+        <button class="close-btn" onclick={toggle}>✕</button>
       </div>
       <div class="modal-body">
-        <slot />
+        <KeyBindingsEditor />
       </div>
     </div>
   </div>

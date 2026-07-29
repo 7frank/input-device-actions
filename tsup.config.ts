@@ -1,6 +1,6 @@
 import { defineConfig } from "tsup";
 import esbuildSvelte from "esbuild-svelte";
-import sveltePreprocess from "svelte-preprocess";
+import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 import type { Plugin } from "esbuild";
 
 const redirectCoreToDistPlugin: Plugin = {
@@ -21,7 +21,7 @@ export default defineConfig([
     dts: true,
     clean: true,
     esbuildPlugins: [
-      esbuildSvelte({ preprocess: sveltePreprocess() }),
+      esbuildSvelte({ preprocess: vitePreprocess() }),
     ],
   },
   {
@@ -32,7 +32,7 @@ export default defineConfig([
     clean: true,
     external: ["svelte", /^svelte\//],
     esbuildPlugins: [
-      esbuildSvelte({ preprocess: sveltePreprocess() }),
+      esbuildSvelte({ preprocess: vitePreprocess() }),
       redirectCoreToDistPlugin,
     ],
   },

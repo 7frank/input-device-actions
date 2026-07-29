@@ -1,23 +1,22 @@
-<script>
+<script lang="ts">
   import {
     getRegistered,
-    isBound,
     rebind,
     addComboForAction,
     resetActionCombosToDefault,
     Hotkeys,
   } from "../../core";
+  import type { ActionOptions } from "../../core";
 
   import KeyBindingsInputItem from "./KeyBindingsInputItem.svelte";
 
-  let entries;
+  let entries: ActionOptions[] = $state(Object.values(getRegistered()));
 
   const reloadEntries = () => (entries = Object.values(getRegistered()));
 
-  reloadEntries();
   Hotkeys.onChange(reloadEntries);
 
-  const isArrayEqual = (x, y) =>
+  const isArrayEqual = (x: unknown[], y: unknown[]) =>
     x.length === y.length && x.every((a, i) => JSON.stringify(a) === JSON.stringify(y[i]));
 </script>
 
@@ -31,7 +30,7 @@
       </tr>
     </thead>
     <tbody>
-      {#each entries as t, i}
+      {#each entries as t}
         <tr>
           <td><span title={t.action}>{t.title}</span></td>
           <td class="combo-cell">
@@ -43,12 +42,12 @@
               />
             {/each}
 
-            <button class="icon-btn" on:click={() => addComboForAction(t.action)} title="add combo">+</button>
+            <button class="icon-btn" onclick={() => addComboForAction(t.action)} title="add combo">+</button>
 
             {#if !isArrayEqual(t.combo, t.defaults)}
               <button
                 class="icon-btn"
-                on:click={() => resetActionCombosToDefault(t.action)}
+                onclick={() => resetActionCombosToDefault(t.action)}
                 title={"reset to defaults: " + t.defaults.map((el) => el.combo).join(" ")}
               >↩</button>
             {/if}

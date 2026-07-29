@@ -32,15 +32,14 @@
     "hotkeys"
   ],
   "devDependencies": {
-    "@sveltejs/vite-plugin-svelte": "^3.0.0",
+    "@sveltejs/vite-plugin-svelte": "^4.0.0",
     "@tsconfig/svelte": "^5.0.0",
-    "esbuild-svelte": "^0.8.0",
+    "esbuild-svelte": "^0.9.0",
     "prettier": "^3.0.0",
     "prettier-plugin-svelte": "^3.0.0",
     "rollup-plugin-visualizer": "^7.0.1",
-    "svelte": "^4.0.0",
-    "svelte-check": "^3.0.0",
-    "svelte-preprocess": "^5.0.0",
+    "svelte": "^5.0.0",
+    "svelte-check": "^4.0.0",
     "tslib": "^2.0.0",
     "tsup": "^8.0.0",
     "typescript": "^5.0.0",
@@ -53,9 +52,9 @@
     "lodash": "^4.17.21",
     "mousetrap": "^1.6.5",
     "mutation-summary": "^1.0.0",
-    "sveltestrap": "^5.6.3",
     "tiny-emitter": "^2.1.0"
   },
+  "files": ["dist", "src"],
   "repository": {
     "type": "git",
     "url": "git://github.com/7frank/input-device-actions.git"
