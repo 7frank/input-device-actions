@@ -1,6 +1,6 @@
 import { onElementChange } from "./listeners";
 import * as _ from "lodash";
-import { assignIn as extend, forEach } from "lodash";
+import { assignIn as extend } from "lodash";
 import Emitter_ from "tiny-emitter";
 import { getMousetrapInstance } from "./mousetrap-wrapper";
 import { hasSecondHandler } from "./utils";
@@ -74,8 +74,17 @@ export function Hotkeys(el: EventTarget | string = window): HotkeysInstance {
 
       return instance;
     },
-    off(_action, _handler, _extra = null) {
-      throw new Error("implementation");
+    off(action, handler, _extra = null) {
+      const defaults = _keys[action];
+      if (!defaults) return instance;
+      const idx = defaults.elements.findIndex((e) => e.handler === handler && e.target === target);
+      if (idx === -1) return instance;
+      const opt = defaults.elements[idx];
+      opt.combo.forEach((comboParam) => {
+        if (comboParam.combo != null) opt.el!.unbind(comboParam.combo.toLowerCase());
+      });
+      defaults.elements.splice(idx, 1);
+      return instance;
     },
   };
 
@@ -135,6 +144,16 @@ Hotkeys.register = function (
   _events.emit("change", { type: "register", action, combo });
 };
 
+Hotkeys.clearRegistered = function (): void {
+  for (const key of Object.keys(_keys)) {
+    if (!_keys[key].persistent) delete _keys[key];
+  }
+  for (const key of Object.keys(_already_set_combos)) {
+    if (!_keys[_already_set_combos[key]]) delete _already_set_combos[key];
+  }
+  _events.emit("change", { type: "clear" });
+};
+
 Hotkeys.registerInputType = function (_type: string, _factory: unknown) {
   throw new Error("not yet supported in this version");
 };
@@ -174,49 +193,18 @@ function bindSingleCombo(opt: ActionOptions, comboParam: ComboParam) {
     return;
   }
 
-  function createCustomActionEvent(e: Event, isFirstHandler: boolean) {
-    const el = opt.selector
-      ? (opt.target as Element).querySelectorAll(opt.selector)
-      : [opt.target as Element];
-
-    forEach(Array.from(el), (val) => {
-      const path = (e as Event & { path?: EventTarget[] }).path ?? (e.composedPath?.() ?? []);
-      const event = new CustomEvent(opt.action, {
-        bubbles: true,
-        detail: { isActionEvent: true, first: isFirstHandler, second: !isFirstHandler, combo: comboParam },
-      });
-      e.target!.dispatchEvent(event);
-    });
-  }
-
   function handlerWrapper(e: Event) {
     if (opt.stopPropagation) e.stopPropagation();
     if (opt.preventDefault) e.preventDefault();
-    createCustomActionEvent(e, true);
+    opt.handler!.call(undefined, e);
+    _events.emit("action", e);
   }
 
   function handlerWrapper2(e: Event) {
     if (opt.stopPropagation) e.stopPropagation();
     if (opt.preventDefault) e.preventDefault();
-    createCustomActionEvent(e, false);
-  }
-
-  const actionHandler = function (e: Event) {
-    if (!hasSecondHandler(opt)) {
-      opt.handler!.apply(this, [e]);
-    } else {
-      const detail = (e as CustomEvent).detail;
-      if (detail.first) opt.handler!.apply(this, [e]);
-      if (detail.second) opt.extra!.apply(this, [e]);
-    }
+    opt.extra!.call(undefined, e);
     _events.emit("action", e);
-  };
-
-  const t = opt.target as FocusableTarget;
-  if (!t.__actions__) t.__actions__ = {};
-  if (!t.__actions__[opt.action]) {
-    t.addEventListener(opt.action, actionHandler);
-    t.__actions__[opt.action] = true;
   }
 
   opt.el!.bind(comboParam.combo!.toLowerCase(), handlerWrapper, handlerWrapper2);

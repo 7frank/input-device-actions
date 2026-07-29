@@ -2,8 +2,17 @@ import Mousetrap from "mousetrap";
 import { hasSecondHandler } from "./utils";
 import type { ActionOptions, InputWrapper } from "./types";
 
+const _mousetrapByTarget = new WeakMap<EventTarget, InstanceType<typeof Mousetrap>>();
+
+function getOrCreateMousetrap(target: EventTarget): InstanceType<typeof Mousetrap> {
+  if (!_mousetrapByTarget.has(target)) {
+    _mousetrapByTarget.set(target, new Mousetrap(target as Element));
+  }
+  return _mousetrapByTarget.get(target)!;
+}
+
 export function getMousetrapInstance(options: ActionOptions): InputWrapper {
-  const instance = new Mousetrap(options.target as Element);
+  const instance = getOrCreateMousetrap(options.target!);
 
   return {
     _instance: instance,

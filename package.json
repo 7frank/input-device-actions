@@ -34,6 +34,7 @@
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^4.0.0",
     "@tsconfig/svelte": "^5.0.0",
+    "@types/mousetrap": "^1.6.15",
     "esbuild-svelte": "^0.9.0",
     "prettier": "^3.0.0",
     "prettier-plugin-svelte": "^3.0.0",

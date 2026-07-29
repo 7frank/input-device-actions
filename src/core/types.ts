@@ -21,6 +21,7 @@ export interface ActionOptions {
   target?: EventTarget;
   el?: InputWrapper;
   "not-registered"?: boolean;
+  persistent?: boolean;
 }
 
 export interface EventEmitter {
@@ -34,7 +35,6 @@ export interface JQueryLike {
 
 export interface FocusableTarget extends HTMLElement {
   __hasFocusFixed?: boolean;
-  __actions__?: Record<string, boolean>;
 }
 
 export interface HotkeysInstance {

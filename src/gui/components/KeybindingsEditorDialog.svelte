@@ -8,6 +8,7 @@
   let open = $state(false);
   const toggle = () => (open = !open);
 
+  Hotkeys.register("help-action", "h", { title: "Help", description: "Toggle the keyboard shortcuts overlay", persistent: true });
   Hotkeys(window).on("help-action", function (e: Event) {
     e.stopPropagation();
     toggle();

@@ -4,19 +4,27 @@ import { KeyBindingsEditor } from "@nk11/keyboard-interactions/ui";
 import "@nk11/keyboard-interactions/ui/index.css";
 import { useSvelteComponent } from "./useSvelteComponent";
 
-Hotkeys.register("save", "ctrl+s", { title: "Save", description: "Save the current file" });
-Hotkeys.register("undo", "ctrl+z", { title: "Undo", description: "Undo last action" });
-Hotkeys.register("redo", "ctrl+shift+z", { title: "Redo", description: "Redo last undone action" });
-
 function SvelteMount() {
   const ref = useSvelteComponent(KeyBindingsEditor);
   const [log, setLog] = useState("press a hotkey...");
 
   useEffect(() => {
+    Hotkeys.clearRegistered();
+    Hotkeys.register("save", "ctrl+s", { title: "Save", description: "Save the current file" });
+    Hotkeys.register("undo", "ctrl+z", { title: "Undo", description: "Undo last action" });
+    Hotkeys.register("redo", "ctrl+shift+z", { title: "Redo", description: "Redo last undone action" });
     const hk = new Hotkeys(window);
-    hk.on("save", () => setLog("save triggered"));
-    hk.on("undo", () => setLog("undo triggered"));
-    hk.on("redo", () => setLog("redo triggered"));
+    const onSave = () => setLog("save triggered");
+    const onUndo = () => setLog("undo triggered");
+    const onRedo = () => setLog("redo triggered");
+    hk.on("save", onSave);
+    hk.on("undo", onUndo);
+    hk.on("redo", onRedo);
+    return () => {
+      hk.off("save", onSave);
+      hk.off("undo", onUndo);
+      hk.off("redo", onRedo);
+    };
   }, []);
 
   return (

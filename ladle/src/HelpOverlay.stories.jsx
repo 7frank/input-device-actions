@@ -4,20 +4,27 @@ import { KeybindingsEditorDialog } from "@nk11/keyboard-interactions/ui";
 import "@nk11/keyboard-interactions/ui/index.css";
 import { useSvelteComponent } from "./useSvelteComponent";
 
-Hotkeys.register("help-action", "h",  { title: "Help",       description: "Toggle the keyboard shortcuts overlay" });
-Hotkeys.register("go-home",    "g h", { title: "Go Home",    description: "Navigate to home" });
-Hotkeys.register("go-search",  "g s", { title: "Go Search",  description: "Navigate to search" });
-Hotkeys.register("go-profile", "g p", { title: "Go Profile", description: "Navigate to profile" });
-
 export const Default = () => {
   const dialogRef = useSvelteComponent(KeybindingsEditorDialog);
   const [nav, setNav] = useState(null);
 
   useEffect(() => {
+    Hotkeys.clearRegistered();
+    Hotkeys.register("go-home",    "g h", { title: "Go Home",    description: "Navigate to home" });
+    Hotkeys.register("go-search",  "g s", { title: "Go Search",  description: "Navigate to search" });
+    Hotkeys.register("go-profile", "g p", { title: "Go Profile", description: "Navigate to profile" });
     const hk = new Hotkeys(window);
-    hk.on("go-home",    () => setNav("🏠 Home"));
-    hk.on("go-search",  () => setNav("🔍 Search"));
-    hk.on("go-profile", () => setNav("👤 Profile"));
+    const onHome    = () => setNav("🏠 Home");
+    const onSearch  = () => setNav("🔍 Search");
+    const onProfile = () => setNav("👤 Profile");
+    hk.on("go-home",    onHome);
+    hk.on("go-search",  onSearch);
+    hk.on("go-profile", onProfile);
+    return () => {
+      hk.off("go-home",    onHome);
+      hk.off("go-search",  onSearch);
+      hk.off("go-profile", onProfile);
+    };
   }, []);
 
   return (
