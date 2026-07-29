@@ -3,6 +3,7 @@ import { Hotkeys } from "@nk11/keyboard-interactions";
 import { KeybindingsEditorDialog } from "@nk11/keyboard-interactions/ui";
 import "@nk11/keyboard-interactions/ui/index.css";
 import { useSvelteComponent } from "./useSvelteComponent";
+import { useHotkeys } from "./useHotkeys";
 
 const COLS = 20;
 const ROWS = 20;
@@ -12,10 +13,7 @@ const TICK = 120;
 function randomFood(snake) {
   let pos;
   do {
-    pos = {
-      x: Math.floor(Math.random() * COLS),
-      y: Math.floor(Math.random() * ROWS),
-    };
+    pos = { x: Math.floor(Math.random() * COLS), y: Math.floor(Math.random() * ROWS) };
   } while (snake.some((s) => s.x === pos.x && s.y === pos.y));
   return pos;
 }
@@ -31,42 +29,35 @@ export const Default = () => {
   const stateRef = useRef(initState());
   const [display, setDisplay] = useState({ score: 0, dead: false, paused: false });
 
-  useEffect(() => {
-    Hotkeys.clearRegistered();
-    Hotkeys.register("move-up",    ["up",    "w"], { title: "Move Up",    description: "Move snake up",    persistent: false });
-    Hotkeys.register("move-down",  ["down",  "s"], { title: "Move Down",  description: "Move snake down",  persistent: false });
-    Hotkeys.register("move-left",  ["left",  "a"], { title: "Move Left",  description: "Move snake left",  persistent: false });
-    Hotkeys.register("move-right", ["right", "d"], { title: "Move Right", description: "Move snake right", persistent: false });
-    Hotkeys.register("pause",      "p",            { title: "Pause",      description: "Pause / unpause",  persistent: false });
-    Hotkeys.register("restart",    "r",            { title: "Restart",    description: "Restart the game", persistent: false });
+  const setDir = (x, y) => {
+    const { dir } = stateRef.current;
+    if (dir.x === -x && dir.y === -y) return;
+    stateRef.current.next = { x, y };
+  };
 
-    const hk = new Hotkeys(canvasRef.current);
-
-    const setDir = (x, y) => {
-      const { dir } = stateRef.current;
-      if (dir.x === -x && dir.y === -y) return;
-      stateRef.current.next = { x, y };
-    };
-
-    const onUp    = () => setDir(0, -1);
-    const onDown  = () => setDir(0,  1);
-    const onLeft  = () => setDir(-1, 0);
-    const onRight = () => setDir( 1, 0);
-    const onPause = () => {
+  useHotkeys({
+    "move-up":    () => setDir(0, -1),
+    "move-down":  () => setDir(0,  1),
+    "move-left":  () => setDir(-1, 0),
+    "move-right": () => setDir( 1, 0),
+    "pause":      () => {
       stateRef.current.paused = !stateRef.current.paused;
       setDisplay(d => ({ ...d, paused: stateRef.current.paused }));
-    };
-    const onRestart = () => {
+    },
+    "restart":    () => {
       stateRef.current = initState();
       setDisplay({ score: 0, dead: false, paused: false });
-    };
+    },
+  }, canvasRef);
 
-    hk.on("move-up",    onUp);
-    hk.on("move-down",  onDown);
-    hk.on("move-left",  onLeft);
-    hk.on("move-right", onRight);
-    hk.on("pause",      onPause);
-    hk.on("restart",    onRestart);
+  useEffect(() => {
+    Hotkeys.clearRegistered();
+    Hotkeys.register("move-up",    ["up",    "w"], { title: "Move Up",    description: "Move snake up" });
+    Hotkeys.register("move-down",  ["down",  "s"], { title: "Move Down",  description: "Move snake down" });
+    Hotkeys.register("move-left",  ["left",  "a"], { title: "Move Left",  description: "Move snake left" });
+    Hotkeys.register("move-right", ["right", "d"], { title: "Move Right", description: "Move snake right" });
+    Hotkeys.register("pause",      "p",            { title: "Pause",      description: "Pause / unpause" });
+    Hotkeys.register("restart",    "r",            { title: "Restart",    description: "Restart the game" });
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
@@ -107,17 +98,14 @@ export const Default = () => {
     const interval = setInterval(() => {
       const s = stateRef.current;
       if (s.dead || s.paused) { draw(); return; }
-
       s.dir = s.next;
       const head = { x: s.snake[0].x + s.dir.x, y: s.snake[0].y + s.dir.y };
-
       if (head.x < 0 || head.x >= COLS || head.y < 0 || head.y >= ROWS || s.snake.some(seg => seg.x === head.x && seg.y === head.y)) {
         s.dead = true;
         setDisplay(d => ({ ...d, dead: true }));
         draw();
         return;
       }
-
       s.snake.unshift(head);
       if (head.x === s.food.x && head.y === s.food.y) {
         s.score++;
@@ -129,17 +117,8 @@ export const Default = () => {
       draw();
     }, TICK);
 
-    canvasRef.current.focus();
-
-    return () => {
-      clearInterval(interval);
-      hk.off("move-up",    onUp);
-      hk.off("move-down",  onDown);
-      hk.off("move-left",  onLeft);
-      hk.off("move-right", onRight);
-      hk.off("pause",      onPause);
-      hk.off("restart",    onRestart);
-    };
+    canvas.focus();
+    return () => clearInterval(interval);
   }, []);
 
   return (
