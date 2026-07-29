@@ -8,10 +8,18 @@
     "dev": "vite",
     "build": "tsup",
     "build:app": "vite build",
+    "analyze": "tsup --metafile && npx esbuild-visualizer --metadata dist/core/metafile-cjs.json --filename stats-core-cjs.html --open && npx esbuild-visualizer --metadata dist/core/metafile-esm.json --filename stats-core-esm.html --open && npx esbuild-visualizer --metadata dist/ui/metafile-esm.json --filename stats-ui-esm.html --open",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "format": "prettier --write ."
   },
+  "exports": {
+    ".": "./dist/core/index.mjs",
+    "./ui": "./dist/ui/index.mjs",
+    "./ui/index.css": "./dist/ui/index.css"
+  },
+  "main": "./dist/core/index.js",
+  "module": "./dist/core/index.mjs",
   "license": "MIT",
   "keywords": [
     "keymap",
@@ -21,15 +29,16 @@
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^3.0.0",
     "@tsconfig/svelte": "^5.0.0",
+    "esbuild-svelte": "^0.8.0",
     "prettier": "^3.0.0",
     "prettier-plugin-svelte": "^3.0.0",
+    "rollup-plugin-visualizer": "^7.0.1",
     "svelte": "^4.0.0",
     "svelte-check": "^3.0.0",
     "svelte-preprocess": "^5.0.0",
     "tslib": "^2.0.0",
-    "typescript": "^5.0.0",
-    "esbuild-svelte": "^0.8.0",
     "tsup": "^8.0.0",
+    "typescript": "^5.0.0",
     "vite": "^5.0.0"
   },
   "dependencies": {

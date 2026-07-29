@@ -1,6 +1,17 @@
 import { defineConfig } from "tsup";
 import esbuildSvelte from "esbuild-svelte";
 import sveltePreprocess from "svelte-preprocess";
+import type { Plugin } from "esbuild";
+
+const redirectCoreToDistPlugin: Plugin = {
+  name: "redirect-core-to-dist",
+  setup(build) {
+    build.onResolve({ filter: /[./]*\/core(\/index\.js)?$/ }, () => ({
+      path: "../core/index.mjs",
+      external: true,
+    }));
+  },
+};
 
 export default defineConfig([
   {
@@ -22,6 +33,7 @@ export default defineConfig([
     external: ["svelte", /^svelte\//],
     esbuildPlugins: [
       esbuildSvelte({ preprocess: sveltePreprocess() }),
+      redirectCoreToDistPlugin,
     ],
   },
 ]);
