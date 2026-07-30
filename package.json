@@ -1,6 +1,6 @@
 {
   "name": "@nk11/keyboard-interactions",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "A wrapper for mousetrap and other human interface libraries with additional actions to be able to change hotkeys for actions via dialog.",
   "author": "Frank Reimann (https://github.com/frank1147)",
   "private": true,

@@ -1,166 +1,133 @@
 |                                |
 | :----------------------------: |
 | <h1>keyboard-interactions</h1> |
-| Wrapper around keyboard inputs |
+| Action-based hotkey management with swappable input adapters |
 
-# Project Overview
+## Overview
 
-This library contains a simple wrapper for _different_ input methods. By introducing an 'action' to bind multiple input combos plus their handlers with it a better customisation by the user may be achieved.
+Bind keyboard (and other input) combos to named **actions**. Actions can be rebound at runtime via a built-in UI dialog. The library ships as three independent packages:
 
-See for yourself with a running [Demo](http://input-device-actions.7frank.surge.sh)
+| Import | Contents |
+|---|---|
+| `@nk11/keyboard-interactions` | Core — action registry, mousetrap adapter |
+| `@nk11/keyboard-interactions/ui` | Svelte components — `KeybindingsEditorDialog`, `KeyBindingsEditor`, `DebugLog` |
+| `@nk11/keyboard-interactions/adapters/humaninput` | HumanInput adapter (gamepad, touch, speech, …) |
+| `@nk11/keyboard-interactions/adapters/keypress` | Keypress.js adapter |
 
-For example:
-
-```javascript
-Hotkeys.register("unique-action-name", "space", {
-  //target:window, // the default target that watches events
-  category: "default",
-  description:
-    "if user presses this combination all listeners will be triggered",
-});
-
-// add listeners somewhere
-Hotkeys(/*target*/) // change the target to another dom element to restrict targets
-  .on("unique-action-name", (evt) => {
-    console.log("action was triggerd", evt);
-  });
-```
-
-For the time being this is not meant to be a stand alone library
-But rather as a backend for a compatible GUI.
-For the reference implementation dowload npm "@nk/core-components" and check out the "nk-hotkey-dialog" example
-
-## Features
-
-- Better Usability by customizing Keyboard Inputs
-
-## credits, references, acknowledgements
-
-- Mousetrap.js - [ccampbell/mousetrap](https://github.com/ccampbell/mousetrap)
-- Keypress.js - [dmauro/Keypress](https://github.com/dmauro/Keypress/)
-
-## technical goals
-
-- function as a no-gui backend for UI components that implement a keymap dialog
-
-## possible extensions
-
-- interface for other HID
-  - gyro+ accelerometer - https://github.com/dorukeker/gyronorm.js/
-  - mouse and touch - http://hammerjs.github.io/recognizer-pinch/
-- though the library is primarily targeted to solve they keymap via actions, we should expose the same functionality without the actions
-  - (this is useful where no configuration will be necessary ike with the gyro maybe)
-
-## TODO
-
-- currently rebinding keys will not work via gui
-
-# +++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-_Psst — looking for a more complete solution? Check out [SvelteKit](https://kit.svelte.dev), the official framework for building web applications of all sizes, with a beautiful development experience and flexible filesystem-based routing._
-
-_Looking for a shareable component template instead? You can [use SvelteKit for that as well](https://kit.svelte.dev/docs#packaging) or the older [sveltejs/component-template](https://github.com/sveltejs/component-template)_
-
----
-
-# svelte app
-
-This is a project template for [Svelte](https://svelte.dev) apps. It lives at https://github.com/sveltejs/template.
-
-To create a new project based on this template using [degit](https://github.com/Rich-Harris/degit):
+## Installation
 
 ```bash
-npx degit sveltejs/template svelte-app
-cd svelte-app
+npm install @nk11/keyboard-interactions
 ```
 
-_Note that you will need to have [Node.js](https://nodejs.org) installed._
+## Basic usage
 
-## Get started
+```ts
+import { Hotkeys } from "@nk11/keyboard-interactions";
 
-Install the dependencies...
+// 1. Register actions (once, at app init)
+Hotkeys.register("save", "ctrl+s", { title: "Save", description: "Save the document" });
+Hotkeys.register("undo", "ctrl+z", { title: "Undo" });
 
-```bash
-cd svelte-app
-npm install
+// 2. Bind handlers (scoped to window by default, or any DOM element)
+const hk = Hotkeys(window);
+
+hk.on("save", (e) => save());
+hk.on("undo", (e) => undo());
+
+// 3. Unbind
+hk.off("save", handler);
 ```
 
-...then start [Rollup](https://rollupjs.org):
+Scope hotkeys to a specific element:
 
-```bash
-npm run dev
+```ts
+const hk = Hotkeys(document.querySelector("#my-panel"));
+hk.on("move-up", () => moveUp());
 ```
 
-Navigate to [localhost:5000](http://localhost:5000). You should see your app running. Edit a component file in `src`, save it, and reload the page to see your changes.
+## Theming
 
-By default, the server will only respond to requests from localhost. To allow connections from other computers, edit the `sirv` commands in package.json to include the option `--host 0.0.0.0`.
+```ts
+import "@nk11/keyboard-interactions/ui/index.css";
 
-If you're using [Visual Studio Code](https://code.visualstudio.com/) we recommend installing the official extension [Svelte for VS Code](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode). If you are using other editors you may need to install a plugin in order to get syntax highlighting and intellisense.
-
-## Building and running in production mode
-
-To create an optimised version of the app:
-
-```bash
-npm run build
+// pick one:
+import "@nk11/keyboard-interactions/ui/themes/dark.css";
+import "@nk11/keyboard-interactions/ui/themes/light.css";
 ```
 
-You can run the newly built app with `npm run start`. This uses [sirv](https://github.com/lukeed/sirv), which is included in your package.json's `dependencies` so that the app will work when you deploy to platforms like [Heroku](https://heroku.com).
+Or define your own CSS variables — see `src/gui/themes/dark.css` for the full list.
 
-## Single-page app mode
+## Pluggable adapters
 
-By default, sirv will only respond to requests that match files in `public`. This is to maximise compatibility with static fileservers, allowing you to deploy your app anywhere.
+Core ships with [mousetrap](https://github.com/ccampbell/mousetrap) as the default keyboard adapter. To use an alternative, import the adapter and register it:
 
-If you're building a single-page app (SPA) with multiple routes, sirv needs to be able to respond to requests for _any_ path. You can make it so by editing the `"start"` command in package.json:
+```ts
+import { Hotkeys } from "@nk11/keyboard-interactions";
+import { getHumanInputInstance } from "@nk11/keyboard-interactions/adapters/humaninput";
+import { getKJSInstance } from "@nk11/keyboard-interactions/adapters/keypress";
 
-```js
-"start": "sirv public --single"
+Hotkeys.registerInputType("humaninput", getHumanInputInstance);
+Hotkeys.registerInputType("keypress", getKJSInstance);
+
+// then use the type in your combo params:
+Hotkeys.register("jump", [{ type: "humaninput", combo: "space" }], { title: "Jump" });
 ```
 
-## Using TypeScript
+Adapters not imported are never bundled — fully tree-shakeable.
 
-This template comes with a script to set up a TypeScript development environment, you can run it immediately after cloning the template with:
+## React helper
 
-```bash
-node scripts/setupTypeScript.js
+```ts
+import { useHotkeys, HotkeysDef } from "./useHotkeys"; // see ladle/src/useHotkeys.ts
+
+const keys = {
+  pause: { keys: "p", title: "Pause" },
+  restart: { keys: "r", title: "Restart" },
+} satisfies HotkeysDef;
+
+useHotkeys(keys, canvasRef)
+  .on("pause",   () => togglePause())
+  .on("restart", () => restart());
 ```
 
-Or remove the script via:
+## API
 
-```bash
-rm scripts/setupTypeScript.js
-```
+### `Hotkeys.register(action, combo, options?)`
 
-If you want to use `baseUrl` or `path` aliases within your `tsconfig`, you need to set up `@rollup/plugin-alias` to tell Rollup to resolve the aliases. For more info, see [this StackOverflow question](https://stackoverflow.com/questions/63427935/setup-tsconfig-path-in-svelte).
+| Param | Type |
+|---|---|
+| `action` | `string` — unique action name |
+| `combo` | `string \| ComboParam \| (string \| ComboParam)[]` |
+| `options` | `Partial<ActionOptions>` — `title`, `description`, `category`, `preventDefault`, `stopPropagation`, `persistent` |
 
-## Deploying to the web
+### `Hotkeys(target?)`
 
-### With [Vercel](https://vercel.com)
+Returns a `HotkeysInstance` scoped to `target` (default: `window`).
 
-Install `vercel` if you haven't already:
+- `.on(action, handler, extraHandler?)` — bind keydown (+ optional keyup)
+- `.off(action, handler)` — unbind
 
-```bash
-npm install -g vercel
-```
+### Static methods
 
-Then, from within your project folder:
+| Method | Description |
+|---|---|
+| `Hotkeys.register(...)` | Declare an action |
+| `Hotkeys.clearRegistered()` | Remove all non-persistent actions |
+| `Hotkeys.registerInputType(type, factory)` | Plug in a custom adapter |
+| `Hotkeys.getRegistered()` | Return all registered actions |
+| `Hotkeys.onChange(handler)` | Subscribe to registry changes |
+| `Hotkeys.onAction(handler)` | Subscribe to action triggers |
 
-```bash
-cd public
-vercel deploy --name my-project
-```
+### Utilities
 
-### With [surge](https://surge.sh/)
+- `rebind(action, comboIndex, newCombo)` — remap a combo at runtime
+- `resetActionCombosToDefault(action, comboIndex?)` — restore defaults
+- `addComboForAction(action)` — append a new empty combo slot
+- `getActionByName(action)` — look up a registered action
 
-Install `surge` if you haven't already:
+## Credits
 
-```bash
-npm install -g surge
-```
-
-Then, from within your project folder:
-
-```bash
-npm run build
-surge public my-project.surge.sh
-```
+- [mousetrap](https://github.com/ccampbell/mousetrap) — Craig Campbell
+- [Keypress.js](https://github.com/dmauro/Keypress/) — David Mauro
+- [HumanInput](https://github.com/liftoff/HumanInput) — Dan McDougall

@@ -7,7 +7,7 @@ import { copyFileSync, mkdirSync } from "fs";
 const redirectCoreToDistPlugin: Plugin = {
   name: "redirect-core-to-dist",
   setup(build) {
-    build.onResolve({ filter: /[./]*\/core(\/index\.js)?$/ }, () => ({
+    build.onResolve({ filter: /[./]*\/core(\/.*)?$/ }, () => ({
       path: "../core/index.mjs",
       external: true,
     }));
