@@ -2,6 +2,7 @@ import { defineConfig } from "tsup";
 import esbuildSvelte from "esbuild-svelte";
 import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 import type { Plugin } from "esbuild";
+import { copyFileSync, mkdirSync } from "fs";
 
 const redirectCoreToDistPlugin: Plugin = {
   name: "redirect-core-to-dist",
@@ -35,5 +36,10 @@ export default defineConfig([
       esbuildSvelte({ preprocess: vitePreprocess() }),
       redirectCoreToDistPlugin,
     ],
+    onSuccess() {
+      mkdirSync("dist/ui/themes", { recursive: true });
+      copyFileSync("src/gui/themes/dark.css",  "dist/ui/themes/dark.css");
+      copyFileSync("src/gui/themes/light.css", "dist/ui/themes/light.css");
+    },
   },
 ]);

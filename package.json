@@ -20,7 +20,9 @@
       "require": "./dist/core/index.js"
     },
     "./ui": "./dist/ui/index.mjs",
-    "./ui/index.css": "./dist/ui/index.css"
+    "./ui/index.css": "./dist/ui/index.css",
+    "./ui/themes/dark.css": "./dist/ui/themes/dark.css",
+    "./ui/themes/light.css": "./dist/ui/themes/light.css"
   },
   "types": "./dist/core/index.d.ts",
   "main": "./dist/core/index.js",

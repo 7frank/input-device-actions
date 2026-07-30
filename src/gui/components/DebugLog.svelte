@@ -36,8 +36,8 @@
   .debug-log {
     font-family: ui-monospace, "Cascadia Code", monospace;
     font-size: 0.8rem;
-    background: #0d0d14;
-    border: 1px solid #2a2a3e;
+    background: var(--ki-bg);
+    border: 1px solid var(--ki-border);
     border-radius: 8px;
     overflow: hidden;
     width: 100%;
@@ -48,9 +48,9 @@
     justify-content: space-between;
     align-items: center;
     padding: 0.35rem 0.75rem;
-    background: #1a1a2e;
-    border-bottom: 1px solid #2a2a3e;
-    color: #94a3b8;
+    background: var(--ki-bg-raised);
+    border-bottom: 1px solid var(--ki-border);
+    color: var(--ki-text-muted);
     font-size: 0.72rem;
     text-transform: uppercase;
     letter-spacing: 0.08em;
@@ -58,17 +58,17 @@
 
   .log-header button {
     background: none;
-    border: 1px solid #3f3f5a;
+    border: 1px solid var(--ki-border);
     border-radius: 4px;
-    color: #64748b;
+    color: var(--ki-text-muted);
     font-size: 0.7rem;
     padding: 0.1rem 0.4rem;
     cursor: pointer;
   }
 
   .log-header button:hover {
-    color: #f59e0b;
-    border-color: #f59e0b;
+    color: var(--ki-warn);
+    border-color: var(--ki-warn);
   }
 
   .log-body {
@@ -81,24 +81,24 @@
     display: flex;
     gap: 0.75rem;
     padding: 0.1rem 0.75rem;
-    color: #cbd5e1;
+    color: var(--ki-text);
   }
 
   .log-line:hover {
-    background: #1a1a2e;
+    background: var(--ki-bg-raised);
   }
 
   .ts {
-    color: #475569;
+    color: var(--ki-text-muted);
     flex-shrink: 0;
   }
 
   .msg {
-    color: #94c6ff;
+    color: var(--ki-log-msg);
   }
 
   .empty {
     padding: 0.5rem 0.75rem;
-    color: #334155;
+    color: var(--ki-text-muted);
   }
 </style>

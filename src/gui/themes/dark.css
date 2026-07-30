@@ -1,0 +1,19 @@
+:root,
+[data-ki-theme="dark"] {
+  --ki-bg:           #13131f;
+  --ki-bg-raised:    #1a1a2e;
+  --ki-border:       #2a2a3e;
+  --ki-border-subtle:#1e1e2e;
+  --ki-backdrop:     rgba(0, 0, 0, 0.6);
+
+  --ki-text:         #cbd5e1;
+  --ki-text-strong:  #e2e8f0;
+  --ki-text-muted:   #64748b;
+
+  --ki-accent:       #7c6af7;
+  --ki-accent-glow:  rgba(124, 106, 247, 0.25);
+  --ki-ok:           #4ade80;
+  --ki-warn:         #f59e0b;
+
+  --ki-log-msg:      #94c6ff;
+}

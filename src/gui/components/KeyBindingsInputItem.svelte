@@ -42,27 +42,27 @@
     display: inline-flex;
     align-items: center;
     gap: 0.3rem;
-    background: #1e1e2e;
-    border: 1.5px solid #444;
+    background: var(--ki-bg-raised);
+    border: 1.5px solid var(--ki-border);
     border-radius: 6px;
     padding: 0.2rem 0.5rem;
     transition: border-color 0.15s, box-shadow 0.15s;
   }
 
   .key-badge.focused {
-    border-color: #7c6af7;
-    box-shadow: 0 0 0 2px rgba(124, 106, 247, 0.25);
+    border-color: var(--ki-accent);
+    box-shadow: 0 0 0 2px var(--ki-accent-glow);
   }
 
   .has-error .key-badge {
-    border-color: #f59e0b;
+    border-color: var(--ki-warn);
   }
 
   input {
     background: transparent;
     border: none;
     outline: none;
-    color: #e2e8f0;
+    color: var(--ki-text-strong);
     font-family: ui-monospace, "Cascadia Code", monospace;
     font-size: 0.8rem;
     width: 7rem;
@@ -71,12 +71,12 @@
   }
 
   input::placeholder {
-    color: #555;
+    color: var(--ki-text-muted);
     font-style: italic;
   }
 
   input:disabled {
-    color: #666;
+    color: var(--ki-text-muted);
     cursor: not-allowed;
   }
 
@@ -87,11 +87,11 @@
   }
 
   .ok {
-    color: #4ade80;
+    color: var(--ki-ok);
   }
 
   .error {
-    color: #f59e0b;
+    color: var(--ki-warn);
     font-size: 0.8rem;
   }
 

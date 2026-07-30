@@ -38,7 +38,7 @@
   .modal-backdrop {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--ki-backdrop);
     z-index: 1000;
   }
 
@@ -56,8 +56,9 @@
   }
 
   .modal-content {
-    background: #fff;
+    background: var(--ki-bg);
     border-radius: 6px;
+    border: 1px solid var(--ki-border);
     box-shadow: 0 4px 32px rgba(0, 0, 0, 0.3);
     display: flex;
     flex-direction: column;
@@ -70,12 +71,13 @@
     align-items: center;
     justify-content: space-between;
     padding: 1rem 1.5rem;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid var(--ki-border);
+    background: var(--ki-bg-raised);
   }
 
   h2 {
     margin: 0;
-    color: #ff3e00;
+    color: var(--ki-accent);
     text-transform: uppercase;
     font-weight: 100;
   }
@@ -86,6 +88,11 @@
     font-size: 1.25rem;
     cursor: pointer;
     line-height: 1;
+    color: var(--ki-text-muted);
+  }
+
+  .close-btn:hover {
+    color: var(--ki-text-strong);
   }
 
   .modal-body {

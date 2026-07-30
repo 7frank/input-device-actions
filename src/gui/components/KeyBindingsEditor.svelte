@@ -64,18 +64,18 @@
 <style>
   .editor {
     width: 100%;
-    background: #13131f;
+    background: var(--ki-bg);
     border-radius: 10px;
-    border: 1px solid #2a2a3e;
+    border: 1px solid var(--ki-border);
     overflow: hidden;
     font-size: 0.9rem;
-    color: #cbd5e1;
+    color: var(--ki-text);
   }
 
   .header {
     padding: 0.75rem 1.25rem;
-    border-bottom: 1px solid #2a2a3e;
-    background: #1a1a2e;
+    border-bottom: 1px solid var(--ki-border);
+    background: var(--ki-bg-raised);
   }
 
   h3 {
@@ -84,7 +84,7 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: #94a3b8;
+    color: var(--ki-text-muted);
   }
 
   .binding-list {
@@ -99,7 +99,7 @@
     justify-content: space-between;
     gap: 1rem;
     padding: 0.65rem 1.25rem;
-    border-bottom: 1px solid #1e1e2e;
+    border-bottom: 1px solid var(--ki-border-subtle);
     transition: background 0.1s;
   }
 
@@ -108,7 +108,7 @@
   }
 
   .binding-row:hover {
-    background: #1a1a2e;
+    background: var(--ki-bg-raised);
   }
 
   .binding-info {
@@ -120,13 +120,13 @@
 
   .action-title {
     font-weight: 600;
-    color: #e2e8f0;
+    color: var(--ki-text-strong);
     font-size: 0.875rem;
   }
 
   .action-desc {
     font-size: 0.75rem;
-    color: #64748b;
+    color: var(--ki-text-muted);
   }
 
   .binding-controls {
@@ -146,9 +146,9 @@
 
   .add-btn {
     background: transparent;
-    border: 1.5px dashed #333;
+    border: 1.5px dashed var(--ki-border);
     border-radius: 6px;
-    color: #555;
+    color: var(--ki-text-muted);
     font-size: 0.75rem;
     padding: 0.2rem 0.5rem;
     cursor: pointer;
@@ -156,15 +156,15 @@
   }
 
   .add-btn:hover {
-    border-color: #7c6af7;
-    color: #7c6af7;
+    border-color: var(--ki-accent);
+    color: var(--ki-accent);
   }
 
   .reset-btn {
     background: transparent;
-    border: 1px solid #3f3f5a;
+    border: 1px solid var(--ki-border);
     border-radius: 6px;
-    color: #64748b;
+    color: var(--ki-text-muted);
     font-size: 0.72rem;
     padding: 0.18rem 0.5rem;
     cursor: pointer;
@@ -172,7 +172,7 @@
   }
 
   .reset-btn:hover {
-    border-color: #f59e0b;
-    color: #f59e0b;
+    border-color: var(--ki-warn);
+    color: var(--ki-warn);
   }
 </style>
