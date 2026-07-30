@@ -316,3 +316,39 @@ function cloneObject<T>(o: T): T {
 export function getRegistered(): Record<string, ActionOptions> {
   return _keys;
 }
+
+export function saveBindings(persistenceKey: string): void {
+  const data: Record<string, ComboParam[]> = {};
+  for (const [action, opts] of Object.entries(_keys)) {
+    data[action] = opts.combo;
+  }
+  localStorage.setItem(persistenceKey, JSON.stringify(data));
+}
+
+export function loadBindings(persistenceKey: string): void {
+  const raw = localStorage.getItem(persistenceKey);
+  if (!raw) return;
+  let data: Record<string, ComboParam[]>;
+  try {
+    data = JSON.parse(raw);
+  } catch {
+    return;
+  }
+  for (const [action, combos] of Object.entries(data)) {
+    const opt = _keys[action];
+    if (!opt) continue;
+    opt.elements.forEach((el) => {
+      opt.combo.forEach((c) => { if (c.combo) el.el?.unbind(c.combo.toLowerCase()); });
+    });
+    opt.combo = combos;
+    opt.elements.forEach((el) => bindAllCombos(el, opt.combo));
+  }
+  _events.emit("change", { type: "load" });
+}
+
+export function resetAllBindings(persistenceKey?: string): void {
+  for (const action of Object.keys(_keys)) {
+    resetActionCombosToDefault(action);
+  }
+  if (persistenceKey) localStorage.removeItem(persistenceKey);
+}

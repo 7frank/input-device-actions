@@ -56,7 +56,7 @@ export default defineConfig([
       esbuildSvelte({ preprocess: vitePreprocess() }),
       redirectCoreToDistPlugin,
     ],
-    onSuccess() {
+    async onSuccess() {
       mkdirSync("dist/ui/themes", { recursive: true });
       copyFileSync("src/gui/themes/dark.css",  "dist/ui/themes/dark.css");
       copyFileSync("src/gui/themes/light.css", "dist/ui/themes/light.css");

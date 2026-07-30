@@ -3,7 +3,7 @@
   import KeyBindingsEditor from "./KeyBindingsEditor.svelte";
   import type { Snippet } from "svelte";
 
-  let { children }: { children?: Snippet } = $props();
+  let { children, persistenceKey }: { children?: Snippet; persistenceKey?: string } = $props();
 
   let open = $state(false);
   const toggle = () => (open = !open);
@@ -27,7 +27,7 @@
         {#if children}
           {@render children()}
         {:else}
-          <KeyBindingsEditor />
+          <KeyBindingsEditor {persistenceKey} />
         {/if}
       </div>
     </div>

@@ -4,25 +4,44 @@
     rebind,
     addComboForAction,
     resetActionCombosToDefault,
+    resetAllBindings,
+    saveBindings,
+    loadBindings,
     Hotkeys,
   } from "../../core";
   import type { ActionOptions } from "../../core";
 
   import KeyBindingsInputItem from "./KeyBindingsInputItem.svelte";
 
+  let { persistenceKey }: { persistenceKey?: string } = $props();
+
   let entries: ActionOptions[] = $state(Object.values(getRegistered()));
 
-  const reloadEntries = () => (entries = Object.values(getRegistered()));
+  const reloadEntries = () => {
+    entries = Object.values(getRegistered());
+    if (persistenceKey) saveBindings(persistenceKey);
+  };
 
   Hotkeys.onChange(reloadEntries);
 
+  $effect(() => {
+    if (persistenceKey) loadBindings(persistenceKey);
+  });
+
   const isArrayEqual = (x: unknown[], y: unknown[]) =>
     x.length === y.length && x.every((a, i) => JSON.stringify(a) === JSON.stringify(y[i]));
+
+  const hasAnyCustom = () => entries.some((t) => !isArrayEqual(t.combo, t.defaults));
 </script>
 
 <div class="editor">
   <div class="header">
     <h3>Key Bindings</h3>
+    {#if hasAnyCustom()}
+      <button class="reset-all-btn" onclick={() => resetAllBindings(persistenceKey)}>
+        Reset all
+      </button>
+    {/if}
   </div>
   <ul class="binding-list">
     {#each entries as t}
@@ -76,6 +95,25 @@
     padding: 0.75rem 1.25rem;
     border-bottom: 1px solid var(--ki-border);
     background: var(--ki-bg-raised);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .reset-all-btn {
+    background: transparent;
+    border: 1px solid var(--ki-border);
+    border-radius: 6px;
+    color: var(--ki-text-muted);
+    font-size: 0.72rem;
+    padding: 0.18rem 0.6rem;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+  }
+
+  .reset-all-btn:hover {
+    border-color: var(--ki-warn);
+    color: var(--ki-warn);
   }
 
   h3 {
