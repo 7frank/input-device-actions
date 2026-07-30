@@ -16,7 +16,7 @@
 </script>
 
 {#if open}
-  <div class="modal-backdrop" onclick={toggle}></div>
+  <div class="modal-backdrop" onclick={toggle} onkeydown={(e) => e.key === 'Escape' && toggle()} role="button" tabindex="-1" aria-label="Close dialog"></div>
   <div class="modal-dialog" role="dialog">
     <div class="modal-content">
       <div class="modal-header">
