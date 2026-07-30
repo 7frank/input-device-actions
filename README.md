@@ -10,6 +10,7 @@ Bind keyboard (and other input) combos to named **actions**. Actions can be rebo
 | Import | Contents |
 |---|---|
 | `@nk11/keyboard-interactions` | Core — action registry, mousetrap adapter |
+| `@nk11/keyboard-interactions/react` | React hooks — `useHotkeys`, `useSvelteComponent` |
 | `@nk11/keyboard-interactions/ui` | Svelte components — `KeybindingsEditorDialog`, `KeyBindingsEditor`, `DebugLog` |
 | `@nk11/keyboard-interactions/adapters/humaninput` | HumanInput adapter (gamepad, touch, speech, …) |
 | `@nk11/keyboard-interactions/adapters/keypress` | Keypress.js adapter |
@@ -76,20 +77,56 @@ Hotkeys.register("jump", [{ type: "humaninput", combo: "space" }], { title: "Jum
 
 Adapters not imported are never bundled — fully tree-shakeable.
 
-## React helper
+## React
 
-```ts
-import { useHotkeys, HotkeysDef } from "./useHotkeys"; // see ladle/src/useHotkeys.ts
+```bash
+npm install @nk11/keyboard-interactions react
+```
+
+### `useHotkeys` — fluent hotkey binding with automatic cleanup
+
+```tsx
+import { useHotkeys, HotkeysDef } from "@nk11/keyboard-interactions/react";
 
 const keys = {
-  pause: { keys: "p", title: "Pause" },
-  restart: { keys: "r", title: "Restart" },
+  pause:   { keys: "p", title: "Pause",   description: "Pause / unpause" },
+  restart: { keys: "r", title: "Restart", description: "Restart the game" },
 } satisfies HotkeysDef;
 
-useHotkeys(keys, canvasRef)
-  .on("pause",   () => togglePause())
-  .on("restart", () => restart());
+function Game() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useHotkeys(keys, canvasRef)       // scope to element, or omit for window
+    .on("pause",   () => togglePause())
+    .on("restart", () => restart());
+
+  // held keys (keydown + keyup)
+  useHotkeys({ thrust: { keys: "space", title: "Thrust" } }, canvasRef)
+    .on("thrust", { keydown: () => startThrust(), keyup: () => stopThrust() });
+
+  return <canvas ref={canvasRef} />;
+}
 ```
+
+### `useSvelteComponent` — mount Svelte 5 components in React
+
+Use this to render the built-in UI components (`KeybindingsEditorDialog`, `KeyBindingsEditor`, `DebugLog`) from React:
+
+```tsx
+import { useSvelteComponent } from "@nk11/keyboard-interactions/react";
+import { KeybindingsEditorDialog } from "@nk11/keyboard-interactions/ui";
+import "@nk11/keyboard-interactions/ui/index.css";
+
+function App() {
+  const dialogRef = useSvelteComponent(KeybindingsEditorDialog, {
+    persistenceKey: "my-app-keybindings",  // optional: saves/restores from localStorage
+  });
+
+  return <div ref={dialogRef} />;
+}
+```
+
+Press `H` to open the dialog. Rebind any key — bindings are saved to `localStorage` automatically and restored on next load. A **Reset all** button appears in the editor header whenever any binding differs from its default.
 
 ## API
 

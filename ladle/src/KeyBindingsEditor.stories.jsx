@@ -38,3 +38,29 @@ function SvelteMount() {
 }
 
 export const Default = () => <SvelteMount />;
+
+const PERSISTENCE_KEY = "ki-story-keybindings";
+
+function PersistentMount() {
+  const ref = useSvelteComponent(KeyBindingsEditor, { persistenceKey: PERSISTENCE_KEY });
+
+  useEffect(() => {
+    Hotkeys.clearRegistered();
+    Hotkeys.register("save",   "ctrl+s",       { title: "Save",   description: "Save the current file" });
+    Hotkeys.register("undo",   "ctrl+z",       { title: "Undo",   description: "Undo last action" });
+    Hotkeys.register("redo",   "ctrl+shift+z", { title: "Redo",   description: "Redo last undone action" });
+    Hotkeys.register("search", "ctrl+f",       { title: "Search", description: "Open search" });
+  }, []);
+
+  return (
+    <div style={{ maxWidth: 600 }}>
+      <p style={{ fontSize: "0.8rem", color: "#888", marginBottom: "0.75rem" }}>
+        Rebind a key — reload the page — bindings are restored from <code>localStorage["{PERSISTENCE_KEY}"]</code>.
+        "Reset all" appears in the header when any binding differs from its default.
+      </p>
+      <div ref={ref} />
+    </div>
+  );
+}
+
+export const WithPersistence = () => <PersistentMount />;

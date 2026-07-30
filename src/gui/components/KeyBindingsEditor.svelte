@@ -17,15 +17,14 @@
 
   let entries: ActionOptions[] = $state(Object.values(getRegistered()));
 
-  const reloadEntries = () => {
+  Hotkeys.onChange((e: { type: string; action?: string }) => {
+    if (persistenceKey && e.type === "register") {
+      loadBindings(persistenceKey);
+    }
+    if (persistenceKey && (e.type === "rebind" || e.type === "reset-to-defaults" || e.type === "create-placeholder")) {
+      saveBindings(persistenceKey);
+    }
     entries = Object.values(getRegistered());
-    if (persistenceKey) saveBindings(persistenceKey);
-  };
-
-  Hotkeys.onChange(reloadEntries);
-
-  $effect(() => {
-    if (persistenceKey) loadBindings(persistenceKey);
   });
 
   const isArrayEqual = (x: unknown[], y: unknown[]) =>

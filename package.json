@@ -1,9 +1,9 @@
 {
   "name": "@nk11/keyboard-interactions",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "A wrapper for mousetrap and other human interface libraries with additional actions to be able to change hotkeys for actions via dialog.",
   "author": "Frank Reimann (https://github.com/frank1147)",
-  "private": true,
+  "private": false,
   "scripts": {
     "dev": "vite",
     "build": "tsup",
@@ -11,7 +11,8 @@
     "analyze": "tsup --metafile && npx esbuild-visualizer --metadata dist/core/metafile-cjs.json --filename stats-core-cjs.html --open && npx esbuild-visualizer --metadata dist/core/metafile-esm.json --filename stats-core-esm.html --open && npx esbuild-visualizer --metadata dist/ui/metafile-esm.json --filename stats-ui-esm.html --open && npx esbuild-visualizer --metadata dist/react/metafile-esm.json --filename stats-react-esm.html --open",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "prepublishOnly": "npm run build"
   },
   "exports": {
     ".": {
