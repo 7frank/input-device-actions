@@ -11,6 +11,7 @@ const _adapterRegistry = new Map<string, AdapterFactory>();
 _adapterRegistry.set("keyboard", getMousetrapInstance);
 
 export type { ActionOptions, ComboParam, InputWrapper, HotkeysInstance, AdapterFactory };
+export { hasSecondHandler } from "./utils";
 
 const Emitter = Emitter_ as unknown as new () => EventEmitter;
 

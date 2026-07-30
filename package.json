@@ -8,7 +8,7 @@
     "dev": "vite",
     "build": "tsup",
     "build:app": "vite build",
-    "analyze": "tsup --metafile && npx esbuild-visualizer --metadata dist/core/metafile-cjs.json --filename stats-core-cjs.html --open && npx esbuild-visualizer --metadata dist/core/metafile-esm.json --filename stats-core-esm.html --open && npx esbuild-visualizer --metadata dist/ui/metafile-esm.json --filename stats-ui-esm.html --open",
+    "analyze": "tsup --metafile && npx esbuild-visualizer --metadata dist/core/metafile-cjs.json --filename stats-core-cjs.html --open && npx esbuild-visualizer --metadata dist/core/metafile-esm.json --filename stats-core-esm.html --open && npx esbuild-visualizer --metadata dist/ui/metafile-esm.json --filename stats-ui-esm.html --open && npx esbuild-visualizer --metadata dist/react/metafile-esm.json --filename stats-react-esm.html --open",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "format": "prettier --write ."
@@ -18,6 +18,10 @@
       "types": "./dist/core/index.d.ts",
       "import": "./dist/core/index.mjs",
       "require": "./dist/core/index.js"
+    },
+    "./react": {
+      "types": "./dist/react/index.d.ts",
+      "import": "./dist/react/index.mjs"
     },
     "./adapters/humaninput": "./dist/adapters/humaninput.mjs",
     "./adapters/keypress": "./dist/adapters/keypress.mjs",
@@ -35,6 +39,12 @@
     "mousetrap",
     "hotkeys"
   ],
+  "peerDependencies": {
+    "react": ">=17"
+  },
+  "peerDependenciesMeta": {
+    "react": { "optional": true }
+  },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^4.0.0",
     "@tsconfig/svelte": "^5.0.0",

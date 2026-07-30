@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Hotkeys } from "@nk11/keyboard-interactions";
 import { KeyBindingsEditor } from "@nk11/keyboard-interactions/ui";
 import "@nk11/keyboard-interactions/ui/index.css";
-import { useSvelteComponent } from "./useSvelteComponent";
+import { useSvelteComponent } from "@nk11/keyboard-interactions/react";
 
 function SvelteMount() {
   const ref = useSvelteComponent(KeyBindingsEditor);

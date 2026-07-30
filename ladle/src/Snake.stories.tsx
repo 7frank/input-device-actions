@@ -2,8 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Hotkeys } from "@nk11/keyboard-interactions";
 import { KeybindingsEditorDialog } from "@nk11/keyboard-interactions/ui";
 import "@nk11/keyboard-interactions/ui/index.css";
-import { useSvelteComponent } from "./useSvelteComponent";
-import { useHotkeys, HotkeysDef } from "./useHotkeys";
+import { useSvelteComponent, useHotkeys, HotkeysDef } from "@nk11/keyboard-interactions/react";
 import { COLS, ROWS, CELL, TICK, State, initState, draw, tick } from "./snake-game";
 
 const snakeKeys = {

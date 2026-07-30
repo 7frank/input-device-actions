@@ -37,6 +37,15 @@ export default defineConfig([
     esbuildPlugins: [redirectCoreToDistPlugin],
   },
   {
+    entry: { index: "src/react/index.ts" },
+    outDir: "dist/react",
+    format: ["esm"],
+    dts: true,
+    clean: true,
+    external: ["react", "svelte", /^svelte\//, "@nk11/keyboard-interactions"],
+    esbuildPlugins: [redirectCoreToDistPlugin],
+  },
+  {
     entry: { index: "src/ui/index.ts" },
     outDir: "dist/ui",
     format: ["esm"],
