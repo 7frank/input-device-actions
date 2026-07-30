@@ -23,23 +23,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
+      - uses: oven-sh/setup-bun@v2
 
       - name: Install root deps
-        run: npm install
+        run: bun install
 
       - name: Build library
-        run: npm run build
+        run: bun run build
 
       - name: Install ladle deps
-        run: npm install
+        run: bun install
         working-directory: ladle
 
       - name: Build stories
-        run: npm run build
+        run: bun run build
         working-directory: ladle
 
       - uses: actions/upload-pages-artifact@v3
