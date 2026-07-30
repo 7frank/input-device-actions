@@ -1,6 +1,6 @@
 import Mousetrap from "mousetrap";
-import { hasSecondHandler } from "./utils";
-import type { ActionOptions, InputWrapper } from "./types";
+import { hasSecondHandler } from "../core/utils";
+import type { ActionOptions, InputWrapper } from "../core/types";
 
 const _mousetrapByTarget = new WeakMap<EventTarget, InstanceType<typeof Mousetrap>>();
 

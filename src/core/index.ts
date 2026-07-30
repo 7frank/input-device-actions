@@ -2,11 +2,15 @@ import { onElementChange } from "./listeners";
 import * as _ from "lodash";
 import { assignIn as extend } from "lodash";
 import Emitter_ from "tiny-emitter";
-import { getMousetrapInstance } from "./mousetrap-wrapper";
+import { getMousetrapInstance } from "../adapters/mousetrap";
 import { hasSecondHandler } from "./utils";
 import type { ActionOptions, ComboParam, InputWrapper, EventEmitter, JQueryLike, FocusableTarget, HotkeysInstance } from "./types";
 
-export type { ActionOptions, ComboParam, InputWrapper, HotkeysInstance };
+type AdapterFactory = (options: ActionOptions) => InputWrapper;
+const _adapterRegistry = new Map<string, AdapterFactory>();
+_adapterRegistry.set("keyboard", getMousetrapInstance);
+
+export type { ActionOptions, ComboParam, InputWrapper, HotkeysInstance, AdapterFactory };
 
 const Emitter = Emitter_ as unknown as new () => EventEmitter;
 
@@ -70,7 +74,7 @@ export function Hotkeys(el: EventTarget | string = window): HotkeysInstance {
       options.handler = handler;
       options.extra = extra ?? undefined;
       options.target = target;
-      options.el = getMousetrapInstance(options);
+      options.el = (_adapterRegistry.get("keyboard") ?? getMousetrapInstance)(options);
 
       defaults.elements.push(options);
 
@@ -95,7 +99,11 @@ export function Hotkeys(el: EventTarget | string = window): HotkeysInstance {
       if (idx === -1) return instance;
       const opt = defaults.elements[idx];
       opt.combo.forEach((comboParam) => {
-        if (comboParam.combo != null) opt.el!.unbind(comboParam.combo.toLowerCase());
+        if (comboParam.combo != null) {
+          const adapterType = comboParam.type ?? "keyboard";
+          const el = (_adapterRegistry.get(adapterType) ?? getMousetrapInstance)(opt);
+          el.unbind(comboParam.combo.toLowerCase());
+        }
       });
       defaults.elements.splice(idx, 1);
       return instance;
@@ -168,8 +176,8 @@ Hotkeys.clearRegistered = function (): void {
   _events.emit("change", { type: "clear" });
 };
 
-Hotkeys.registerInputType = function (_type: string, _factory: unknown) {
-  throw new Error("not yet supported in this version");
+Hotkeys.registerInputType = function (type: string, factory: AdapterFactory) {
+  _adapterRegistry.set(type, factory);
 };
 
 Hotkeys.onChange = function (handler: (e: unknown) => void) {
@@ -207,6 +215,10 @@ function bindSingleCombo(opt: ActionOptions, comboParam: ComboParam) {
     return;
   }
 
+  const adapterType = comboParam.type ?? "keyboard";
+  const factory = _adapterRegistry.get(adapterType) ?? getMousetrapInstance;
+  const el = factory(opt);
+
   function handlerWrapper(e: Event) {
     if (opt.stopPropagation) e.stopPropagation();
     if (opt.preventDefault) e.preventDefault();
@@ -221,7 +233,7 @@ function bindSingleCombo(opt: ActionOptions, comboParam: ComboParam) {
     _events.emit("action", e);
   }
 
-  opt.el!.bind(comboParam.combo!.toLowerCase(), handlerWrapper, handlerWrapper2);
+  el.bind(comboParam.combo!.toLowerCase(), handlerWrapper, handlerWrapper2);
 }
 
 export function isBound(combo: string): boolean {
@@ -237,9 +249,11 @@ export function getActionByName(action: string): ActionOptions {
 }
 
 function unbind(opt: ActionOptions, prevCombo: ComboParam) {
+  const adapterType = prevCombo.type ?? "keyboard";
   opt.elements.forEach((opt0) => {
     if (debug) console.log("unbind", opt0, prevCombo);
-    opt0.el!.unbind(prevCombo.combo!.toLowerCase());
+    const el = (_adapterRegistry.get(adapterType) ?? getMousetrapInstance)(opt0);
+    el.unbind(prevCombo.combo!.toLowerCase());
   });
 }
 

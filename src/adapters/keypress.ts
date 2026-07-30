@@ -1,8 +1,9 @@
 import * as keypress from "keypress.js";
-import type { ActionOptions, InputWrapper, KeypressListener } from "./types";
+import type { ActionOptions, InputWrapper, KeypressListener } from "../core/types";
 
 export function getKJSInstance(options: ActionOptions): InputWrapper {
-  const instance = new (keypress as unknown as { Listener: new (target: EventTarget | undefined) => KeypressListener }).Listener(options.target);
+  const { Listener } = (keypress as unknown as { keypress: { Listener: new (target: EventTarget | undefined) => KeypressListener } }).keypress;
+  const instance = new Listener(options.target);
 
   return {
     _instance: instance,

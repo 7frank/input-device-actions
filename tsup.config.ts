@@ -26,6 +26,17 @@ export default defineConfig([
     ],
   },
   {
+    entry: {
+      humaninput: "src/adapters/humaninput.ts",
+      keypress: "src/adapters/keypress.ts",
+    },
+    outDir: "dist/adapters",
+    format: ["esm"],
+    dts: true,
+    clean: true,
+    esbuildPlugins: [redirectCoreToDistPlugin],
+  },
+  {
     entry: { index: "src/ui/index.ts" },
     outDir: "dist/ui",
     format: ["esm"],

@@ -19,6 +19,8 @@
       "import": "./dist/core/index.mjs",
       "require": "./dist/core/index.js"
     },
+    "./adapters/humaninput": "./dist/adapters/humaninput.mjs",
+    "./adapters/keypress": "./dist/adapters/keypress.mjs",
     "./ui": "./dist/ui/index.mjs",
     "./ui/index.css": "./dist/ui/index.css",
     "./ui/themes/dark.css": "./dist/ui/themes/dark.css",

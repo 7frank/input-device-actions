@@ -1,6 +1,6 @@
 import HumanInput from "humaninput/dist/humaninput-1.1.15-full";
-import { hasSecondHandler } from "./utils";
-import type { ActionOptions, InputWrapper, HumanInputInstance } from "./types";
+import { hasSecondHandler } from "../core/utils";
+import type { ActionOptions, InputWrapper, HumanInputInstance } from "../core/types";
 
 let HIDocumentInstance: HumanInputInstance | undefined;
 
